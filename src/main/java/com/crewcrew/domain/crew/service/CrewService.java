@@ -1,9 +1,19 @@
 package com.crewcrew.domain.crew.service;
 
-import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.crewcrew.domain.member.entity.*;
-import com.crewcrew.domain.member.repository.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
+import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
+import com.crewcrew.domain.crew.dto.response.ImageResponseDTO;
+import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.crew.repository.CrewRepository;
+import com.crewcrew.domain.crew.repository.ImageRepository;
+import com.crewcrew.domain.member.entity.Member;
+import com.crewcrew.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,7 +21,53 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewService {
 
+  private final CrewRepository crewRepository;
   private final MemberRepository memberRepository;
+  private final ImageRepository imageRepository;
+
+  @Transactional
+  public CrewResponseDTO createCrew(CrewCreateRequestDTO request) {
+    Member member = findMemberById(getMemberId());
+    Crew savedCrew = saveCrew(request, member);
+    List<ImageResponseDTO> images = getImagesByCrewId(savedCrew.getId());
+
+    return convertToDTO(savedCrew, images);
+  }
+
+  private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
+    Crew crew =
+        Crew.builder()
+            .location(request.location())
+            .detailedLocation(request.detailedLocation())
+            .type(request.type())
+            .subType(request.subType())
+            .name(request.name())
+            .description(request.description())
+            .capacity(request.capacity())
+            .member(member)
+            .build();
+    return crewRepository.save(crew);
+  }
+
+  private List<ImageResponseDTO> getImagesByCrewId(Long crewId) {
+    return imageRepository.findByReferenceId(crewId).stream()
+        .map(image -> new ImageResponseDTO(image.getImagePath()))
+        .collect(Collectors.toList());
+  }
+
+  private CrewResponseDTO convertToDTO(Crew crew, List<ImageResponseDTO> images) {
+    return new CrewResponseDTO(
+        crew.getId(),
+        crew.getType(),
+        crew.getSubType(),
+        crew.getName(),
+        crew.getLocation(),
+        crew.getDetailedLocation(),
+        crew.getParticipantCount(),
+        crew.getCapacity(),
+        images,
+        crew.getMember().getId());
+  }
 
   private Member findMemberById(Long memberId) {
     return memberRepository
