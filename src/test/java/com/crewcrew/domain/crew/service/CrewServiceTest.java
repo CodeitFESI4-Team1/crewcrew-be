@@ -41,37 +41,31 @@ class CrewServiceTest {
   @Test
   @DisplayName("크루 생성 후 responseDTO 반환")
   void testCreateCrew() {
-    // given
     CrewCreateRequestDTO request = createCrewCreateRequest();
     when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
     Crew savedCrew = createSavedCrew(request);
     when(crewRepository.save(any(Crew.class))).thenReturn(savedCrew);
     setupImageRepository(savedCrew.getId());
 
-    // when
     CrewResponseDTO response = crewService.createCrew(request);
 
-    // then
     validateResponse(response, savedCrew);
   }
 
   @Test
   @DisplayName("크루 조회 시 인기순 정렬 적용")
   void testGetCrewByPopularity() {
-    // given
     CrewFss fss = new CrewFss(null, null, null, null, null);
     Pageable pageable = PageRequest.of(0, 10, Sort.by("participantCount").descending());
 
-    Crew crew1 = createCrew(1L, "축구 동호회", 5);
-    Crew crew2 = createCrew(2L, "농구 동호회", 10);
+    Crew crew1 = createCrew(1L, "축구 동호회", 5, 1L);
+    Crew crew2 = createCrew(2L, "농구 동호회", 10, 1L);
 
     when(crewRepository.findFilteredCrews(fss, pageable))
         .thenReturn(createCrewSlice(List.of(crew2, crew1), pageable));
 
-    // when
     Slice<CrewListResponseDTO> response = crewService.getCrew(fss, pageable);
 
-    // then
     assertThat(response).isNotNull();
     assertThat(response.getContent()).hasSize(2);
     assertThat(response.getContent().get(0).name()).isEqualTo("농구 동호회");
@@ -81,24 +75,40 @@ class CrewServiceTest {
   @Test
   @DisplayName("크루 조회 시 키워드 필터링 적용")
   void testGetCrewByKeyword() {
-    // given
     CrewFss fss = new CrewFss(null, null, "마포구", null, "농구");
     Pageable pageable = PageRequest.of(0, 10, Sort.by("participantCount").descending());
 
-    Crew crew1 = createCrew(1L, "축구 동호회", 5);
-    Crew crew2 = createCrew(2L, "농구 동호회", 10);
+    Crew crew1 = createCrew(1L, "축구 동호회", 5, 1L);
+    Crew crew2 = createCrew(2L, "농구 동호회", 10, 1L);
 
     when(crewRepository.findFilteredCrews(fss, pageable))
         .thenReturn(createCrewSlice(List.of(crew2), pageable));
 
-    // when
     Slice<CrewListResponseDTO> response = crewService.getCrew(fss, pageable);
 
-    // then
     assertThat(response).isNotNull();
     assertThat(response.getContent()).hasSize(1);
     assertThat(response.getContent().get(0).name()).isEqualTo("농구 동호회");
     assertThat(response.getContent()).doesNotContain(convertToListDTO(crew1));
+  }
+
+  @Test
+  @DisplayName("주최자가 생성한 크루 조회")
+  void testGetCreatedCrew() {
+    Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+    Crew crew1 = createCrew(1L, "축구 동호회", 5, 1L); // 주최자
+    Crew crew2 = createCrew(2L, "농구 동호회", 10, 2L);
+
+    when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+    when(crewRepository.findByMember(member, pageable))
+        .thenReturn(createCrewSlice(List.of(crew1), pageable));
+
+    Slice<CrewListResponseDTO> response = crewService.getCreatedCrew(pageable);
+
+    assertThat(response).isNotNull();
+    assertThat(response.getContent()).hasSize(1);
+    assertThat(response.getContent().get(0).name()).isEqualTo("축구 동호회");
+    assertThat(response.getContent()).doesNotContain(convertToListDTO(crew2));
   }
 
   private CrewCreateRequestDTO createCrewCreateRequest() {
@@ -125,7 +135,7 @@ class CrewServiceTest {
         .thenReturn(List.of(image));
   }
 
-  private Crew createCrew(Long id, String name, int participantCount) {
+  private Crew createCrew(Long id, String name, int participantCount, Long memberId) {
     return Crew.builder()
         .id(id)
         .name(name)
@@ -136,7 +146,7 @@ class CrewServiceTest {
         .detailedLocation(name.equals("축구 동호회") ? "강남구" : "마포구")
         .capacity(20)
         .participantCount(participantCount)
-        .member(member)
+        .member(Member.builder().id(memberId).name("테스트 회원").build())
         .build();
   }
 
