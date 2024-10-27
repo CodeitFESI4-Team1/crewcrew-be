@@ -1,11 +1,11 @@
 package com.crewcrew.domain.crew.controller;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
-import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
-import com.crewcrew.domain.crew.service.CrewService;
+import com.crewcrew.domain.crew.dto.request.*;
+import com.crewcrew.domain.crew.dto.response.*;
+import com.crewcrew.domain.crew.service.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,6 @@ public class CrewController {
 
   @PostMapping
   public ResponseEntity<CrewResponseDTO> createCrew(@RequestBody CrewCreateRequestDTO request) {
-
-    CrewResponseDTO response = crewService.createCrew(request);
-
-    return ResponseEntity.ok(response);
+    return new ResponseEntity<>(crewService.createCrew(request), HttpStatus.CREATED);
   }
 }
