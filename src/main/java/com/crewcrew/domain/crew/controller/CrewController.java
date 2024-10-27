@@ -33,4 +33,12 @@ public class CrewController {
           Pageable pageable) {
     return ResponseEntity.ok(crewService.getCrew(fss, pageable));
   }
+
+  @GetMapping("/created")
+  public ResponseEntity<Slice<CrewListResponseDTO>> getCreatedCrew(
+      @PageableDefault(size = 5, page = 0, sort = "updatedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    Slice<CrewListResponseDTO> crews = crewService.getCreatedCrew(pageable);
+    return ResponseEntity.ok(crews);
+  }
 }
