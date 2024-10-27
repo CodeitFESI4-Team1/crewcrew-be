@@ -13,6 +13,7 @@ import com.crewcrew.domain.crew.dto.response.CrewListResponseDTO;
 import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
 import com.crewcrew.domain.crew.dto.response.ImageResponseDTO;
 import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.crew.enums.ImageType;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.ImageRepository;
 import com.crewcrew.domain.member.entity.Member;
@@ -39,12 +40,19 @@ public class CrewService {
 
   @Transactional(readOnly = true)
   public Slice<CrewListResponseDTO> getCrew(CrewFss fss, Pageable pageable) {
-    Slice<Crew> entities = crewRepository.findFilteredCrews(fss, pageable);
-    return entities.map(
+    Slice<Crew> crewSlice = crewRepository.findFilteredCrews(fss, pageable);
+    return crewSlice.map(
         e -> {
           List<ImageResponseDTO> images = getImagesByCrewId(e.getId());
           return convertToListDTO(e, images);
         });
+  }
+
+  @Transactional(readOnly = true)
+  public Slice<CrewListResponseDTO> getCreatedCrew(Pageable pageable) {
+    Member member = findMemberById(getMemberId());
+    Slice<Crew> crews = crewRepository.findByMember(member, pageable);
+    return crews.map(e -> convertToListDTO(e, getImagesByCrewId(e.getId())));
   }
 
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
@@ -63,7 +71,7 @@ public class CrewService {
   }
 
   private List<ImageResponseDTO> getImagesByCrewId(Long crewId) {
-    return imageRepository.findByReferenceId(crewId).stream()
+    return imageRepository.findByReferenceIdAndImageType(crewId, ImageType.CREW).stream()
         .map(image -> new ImageResponseDTO(image.getImagePath()))
         .toList();
   }
@@ -109,6 +117,6 @@ public class CrewService {
 
   // 임시 처리
   private Long getMemberId() {
-    return 1L;
+    return 2L;
   }
 }
