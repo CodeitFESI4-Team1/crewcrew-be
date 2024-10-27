@@ -5,8 +5,11 @@ import org.springframework.data.domain.Slice;
 
 import com.crewcrew.domain.crew.dto.request.CrewFss;
 import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.member.entity.Member;
 
 public interface CrewCustomRepository {
 
   Slice<Crew> findFilteredCrews(CrewFss fss, Pageable pageable);
+
+  Slice<Crew> findByMember(Member member, Pageable pageable);
 }
