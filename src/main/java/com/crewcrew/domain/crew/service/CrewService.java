@@ -15,6 +15,7 @@ import com.crewcrew.domain.crew.dto.response.*;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.CrewInfo;
 import com.crewcrew.domain.crew.enums.ImageType;
+import com.crewcrew.domain.crew.mapper.CrewMapper;
 import com.crewcrew.domain.crew.repository.CrewInfoRepository;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.ImageRepository;
@@ -33,6 +34,7 @@ public class CrewService {
   private final MemberRepository memberRepository;
   private final ImageRepository imageRepository;
   private final CrewInfoRepository crewInfoRepository;
+  private final CrewMapper mapper;
 
   @Transactional
   public CrewResponseDTO createCrew(CrewCreateRequestDTO request) {
@@ -40,7 +42,7 @@ public class CrewService {
     Crew savedCrew = saveCrew(request, member);
     List<ImageResponseDTO> images = getImagesByCrewId(savedCrew.getId());
 
-    return convertToDTO(savedCrew, images);
+    return mapper.crewResponseDTO(savedCrew, images);
   }
 
   @Transactional(readOnly = true)
@@ -49,7 +51,7 @@ public class CrewService {
     return crewSlice.map(
         e -> {
           List<ImageResponseDTO> images = getImagesByCrewId(e.getId());
-          return convertToListDTO(e, images);
+          return mapper.crewListResponseDTO(e, images);
         });
   }
 
@@ -57,7 +59,7 @@ public class CrewService {
   public Slice<CrewListResponseDTO> getCreatedCrew(Pageable pageable) {
     Member member = findMemberById(getMemberId());
     Slice<Crew> crews = crewRepository.findByMember(member, pageable);
-    return crews.map(e -> convertToListDTO(e, getImagesByCrewId(e.getId())));
+    return crews.map(e -> mapper.crewListResponseDTO(e, getImagesByCrewId(e.getId())));
   }
 
   @Transactional(readOnly = true)
@@ -73,7 +75,7 @@ public class CrewService {
     return crewSlice.map(
         crew -> {
           List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
-          return convertToListDTO(crew, images);
+          return mapper.crewListResponseDTO(crew, images);
         });
   }
 
@@ -83,7 +85,7 @@ public class CrewService {
     List<JoinedParticipantDTO> participants = getParticipantsByCrewId(crew.getId());
     List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
 
-    return convertToDetailDTO(crew, images, participants);
+    return mapper.crewDetailResponseDTO(crew, images, participants);
   }
 
   @Transactional(readOnly = true)
@@ -117,59 +119,6 @@ public class CrewService {
     return imageRepository.findByReferenceIdAndImageType(crewId, ImageType.CREW).stream()
         .map(image -> new ImageResponseDTO(image.getImagePath()))
         .toList();
-  }
-
-  private CrewResponseDTO convertToDTO(Crew crew, List<ImageResponseDTO> images) {
-    return new CrewResponseDTO(
-        crew.getId(),
-        crew.getType(),
-        crew.getSubType(),
-        crew.getName(),
-        crew.getLocation(),
-        crew.getDetailedLocation(),
-        crew.getParticipantCount(),
-        crew.getCapacity(),
-        images,
-        crew.getMember().getId());
-  }
-
-  private CrewListResponseDTO convertToListDTO(Crew crew, List<ImageResponseDTO> images) {
-    return new CrewListResponseDTO(
-        crew.getId(),
-        crew.getType(),
-        crew.getSubType(),
-        crew.getName(),
-        crew.getDescription(),
-        crew.getLocation(),
-        crew.getDetailedLocation(),
-        crew.getParticipantCount(),
-        crew.getCapacity(),
-        images,
-        crew.getMember().getId(),
-        crew.getCreatedAt(),
-        crew.getUpdatedAt(),
-        crew.getCanceledAt(),
-        crew.getIsConfirmed());
-  }
-
-  private CrewDetailResponseDTO convertToDetailDTO(
-      Crew crew, List<ImageResponseDTO> images, List<JoinedParticipantDTO> participants) {
-    return new CrewDetailResponseDTO(
-        crew.getId(),
-        crew.getType(),
-        crew.getSubType(),
-        crew.getName(),
-        crew.getLocation(),
-        crew.getDetailedLocation(),
-        crew.getParticipantCount(),
-        crew.getCapacity(),
-        images,
-        crew.getMember().getId(),
-        crew.getCreatedAt(),
-        crew.getUpdatedAt(),
-        crew.getCanceledAt(),
-        crew.getIsConfirmed(),
-        participants);
   }
 
   private Crew findCrewById(Long id) {
