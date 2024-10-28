@@ -104,6 +104,32 @@ class CrewServiceTest {
     assertThat(response.getContent()).doesNotContain(createCrewListResponseDTO(crew3));
   }
 
+  @Test
+  @DisplayName("주최자가 크루 업데이트")
+  void testUpdateCrewSuccess() {
+    Long crewId = 1L;
+    Crew existingCrew = createCrew(crewId, "축구 동호회", 5);
+
+    CrewUpdateRequestDTO updateRequest =
+        new CrewUpdateRequestDTO(null, null, null, null, "주말 축구 동호회", "업데이트된 설명", null);
+
+    when(crewRepository.findById(crewId)).thenReturn(Optional.of(existingCrew));
+    when(crewRepository.existsByIdAndMemberId(crewId, MEMBER_ID)).thenReturn(true);
+
+    existingCrew.update(updateRequest);
+
+    when(crewRepository.save(existingCrew)).thenReturn(existingCrew);
+    when(mapper.crewResponseDTO(any(Crew.class), anyList()))
+        .thenReturn(createCrewResponseDTO(existingCrew));
+
+    CrewResponseDTO response = crewService.updateCrew(crewId, updateRequest);
+
+    assertThat(response).isNotNull();
+    assertThat(response.name()).isEqualTo("주말 축구 동호회");
+    assertThat(response.description()).isEqualTo("업데이트된 설명");
+    assertThat(response.capacity()).isEqualTo(existingCrew.getCapacity());
+  }
+
   private CrewCreateRequestDTO createCrewCreateRequest() {
     return new CrewCreateRequestDTO(
         Category.BALL_SPORTS, SubCategory.SOCCER, "축구 동호회", "재미있는 축구 팀", "강남구 논현로", "운동장", 20);
