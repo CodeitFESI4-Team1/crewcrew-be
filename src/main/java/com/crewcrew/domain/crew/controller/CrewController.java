@@ -55,4 +55,11 @@ public class CrewController {
     CrewDetailResponseDTO crewDetails = crewService.getCrewDetails(id);
     return ResponseEntity.ok(crewDetails);
   }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<CrewResponseDTO> updateCrew(
+      @PathVariable Long id, @RequestBody CrewUpdateRequestDTO request) {
+    CrewResponseDTO updatedCrew = crewService.updateCrew(id, request);
+    return ResponseEntity.ok(updatedCrew);
+  }
 }
