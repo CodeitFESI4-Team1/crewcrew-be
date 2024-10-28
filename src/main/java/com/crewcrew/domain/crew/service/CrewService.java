@@ -11,10 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
 import com.crewcrew.domain.crew.dto.request.CrewFss;
-import com.crewcrew.domain.crew.dto.response.CrewListResponseDTO;
-import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
-import com.crewcrew.domain.crew.dto.response.ImageResponseDTO;
+import com.crewcrew.domain.crew.dto.response.*;
 import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.crew.entity.CrewInfo;
 import com.crewcrew.domain.crew.enums.ImageType;
 import com.crewcrew.domain.crew.repository.CrewInfoRepository;
 import com.crewcrew.domain.crew.repository.CrewRepository;
@@ -65,8 +64,6 @@ public class CrewService {
   public Slice<CrewListResponseDTO> getJoinedCrew(Pageable pageable) {
     List<Long> crewIds = crewInfoRepository.findCrewIdsByMemberId(getMemberId());
 
-    log.info("crewIds={}", crewIds);
-
     if (crewIds.isEmpty()) {
       return new SliceImpl<>(Collections.emptyList(), pageable, false);
     }
@@ -78,6 +75,27 @@ public class CrewService {
           List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
           return convertToListDTO(crew, images);
         });
+  }
+
+  @Transactional(readOnly = true)
+  public CrewDetailResponseDTO getCrewDetails(Long id) {
+    Crew crew = findCrewById(id);
+    List<JoinedParticipantDTO> participants = getParticipantsByCrewId(crew.getId());
+    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
+
+    return convertToDetailDTO(crew, images, participants);
+  }
+
+  @Transactional(readOnly = true)
+  public List<JoinedParticipantDTO> getParticipantsByCrewId(Long crewId) {
+    List<CrewInfo> crewInfos = crewInfoRepository.findByCrewId(crewId);
+
+    return crewInfos.stream()
+        .map(
+            crewInfo ->
+                new JoinedParticipantDTO(
+                    crewInfo.getMember().getId(), crewInfo.getMember().getName()))
+        .toList();
   }
 
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
@@ -132,6 +150,30 @@ public class CrewService {
         crew.getUpdatedAt(),
         crew.getCanceledAt(),
         crew.getIsConfirmed());
+  }
+
+  private CrewDetailResponseDTO convertToDetailDTO(
+      Crew crew, List<ImageResponseDTO> images, List<JoinedParticipantDTO> participants) {
+    return new CrewDetailResponseDTO(
+        crew.getId(),
+        crew.getType(),
+        crew.getSubType(),
+        crew.getName(),
+        crew.getLocation(),
+        crew.getDetailedLocation(),
+        crew.getParticipantCount(),
+        crew.getCapacity(),
+        images,
+        crew.getMember().getId(),
+        crew.getCreatedAt(),
+        crew.getUpdatedAt(),
+        crew.getCanceledAt(),
+        crew.getIsConfirmed(),
+        participants);
+  }
+
+  private Crew findCrewById(Long id) {
+    return crewRepository.findById(id).orElseThrow(() -> new RuntimeException("Crew not found"));
   }
 
   private Member findMemberById(Long memberId) {
