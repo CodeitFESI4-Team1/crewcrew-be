@@ -16,6 +16,7 @@ public class CrewMapper {
         crew.getType(),
         crew.getSubType(),
         crew.getName(),
+        crew.getDescription(),
         crew.getLocation(),
         crew.getDetailedLocation(),
         crew.getParticipantCount(),
