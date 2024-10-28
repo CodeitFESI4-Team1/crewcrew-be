@@ -112,17 +112,7 @@ public class CrewService {
   }
 
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
-    Crew crew =
-        Crew.builder()
-            .location(request.location())
-            .detailedLocation(request.detailedLocation())
-            .type(request.type())
-            .subType(request.subType())
-            .name(request.name())
-            .description(request.description())
-            .capacity(request.capacity())
-            .member(member)
-            .build();
+    Crew crew = mapper.toEntity(request, member);
     return crewRepository.save(crew);
   }
 
