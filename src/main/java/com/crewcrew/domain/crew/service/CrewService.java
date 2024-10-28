@@ -1,9 +1,11 @@
 package com.crewcrew.domain.crew.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +16,16 @@ import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
 import com.crewcrew.domain.crew.dto.response.ImageResponseDTO;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.enums.ImageType;
+import com.crewcrew.domain.crew.repository.CrewInfoRepository;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.ImageRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CrewService {
@@ -28,6 +33,7 @@ public class CrewService {
   private final CrewRepository crewRepository;
   private final MemberRepository memberRepository;
   private final ImageRepository imageRepository;
+  private final CrewInfoRepository crewInfoRepository;
 
   @Transactional
   public CrewResponseDTO createCrew(CrewCreateRequestDTO request) {
@@ -53,6 +59,25 @@ public class CrewService {
     Member member = findMemberById(getMemberId());
     Slice<Crew> crews = crewRepository.findByMember(member, pageable);
     return crews.map(e -> convertToListDTO(e, getImagesByCrewId(e.getId())));
+  }
+
+  @Transactional(readOnly = true)
+  public Slice<CrewListResponseDTO> getJoinedCrew(Pageable pageable) {
+    List<Long> crewIds = crewInfoRepository.findCrewIdsByMemberId(getMemberId());
+
+    log.info("crewIds={}", crewIds);
+
+    if (crewIds.isEmpty()) {
+      return new SliceImpl<>(Collections.emptyList(), pageable, false);
+    }
+
+    Slice<Crew> crewSlice = crewRepository.findAllById(crewIds, pageable);
+
+    return crewSlice.map(
+        crew -> {
+          List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
+          return convertToListDTO(crew, images);
+        });
   }
 
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
@@ -117,6 +142,6 @@ public class CrewService {
 
   // 임시 처리
   private Long getMemberId() {
-    return 2L;
+    return 1L;
   }
 }
