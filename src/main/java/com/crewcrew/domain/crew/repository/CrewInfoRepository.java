@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.crewcrew.domain.crew.entity.CrewInfo;
 
-import io.lettuce.core.dynamic.annotation.Param;
-
 public interface CrewInfoRepository extends JpaRepository<CrewInfo, Long> {
   @Query("SELECT ci.crew.id FROM CrewInfo ci WHERE ci.member.id = :memberId")
-  List<Long> findCrewIdsByMemberId(@Param("memberId") Long memberId);
+  List<Long> findCrewIdsByMemberId(Long memberId);
+
+  // @Query("SELECT ci FROM CrewInfo ci WHERE ci.crew.id = :crewId")
+  List<CrewInfo> findByCrewId(Long crewId);
 }
