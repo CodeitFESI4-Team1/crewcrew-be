@@ -58,6 +58,24 @@ public class CrewCustomRepositoryImpl implements CrewCustomRepository {
     return new SliceImpl<>(entities, pageable, entities.size() == pageable.getPageSize());
   }
 
+  @Override
+  public Slice<Crew> findAllById(Iterable<Long> ids, Pageable pageable) {
+    List<Long> idList = new ArrayList<>();
+    ids.forEach(idList::add);
+
+    List<Crew> entities =
+        jpaQueryFactory
+            .selectFrom(crew)
+            .where(crew.id.in(idList))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(getOrderSpecifier(pageable.getSort()))
+            .fetch();
+
+    boolean hasNext = entities.size() == pageable.getPageSize();
+    return new SliceImpl<>(entities, pageable, hasNext);
+  }
+
   // WHERE
   private BooleanExpression condSubType(String subType) {
     return subType == null ? null : crew.subType.eq(SubCategory.valueOf(subType));
