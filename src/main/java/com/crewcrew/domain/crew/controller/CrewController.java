@@ -62,4 +62,10 @@ public class CrewController {
     CrewResponseDTO updatedCrew = crewService.updateCrew(id, request);
     return ResponseEntity.ok(updatedCrew);
   }
+
+  @PostMapping("/{id}/join")
+  public ResponseEntity<Void> joinCrew(@PathVariable Long id) {
+    crewService.join(id);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
 }
