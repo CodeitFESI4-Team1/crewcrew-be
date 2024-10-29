@@ -6,4 +6,4 @@ import org.springframework.stereotype.Repository;
 import com.crewcrew.domain.crew.entity.Crew;
 
 @Repository
-public interface CrewRepository extends JpaRepository<Crew, Long> {}
+public interface CrewRepository extends JpaRepository<Crew, Long>, CrewCustomRepository {}

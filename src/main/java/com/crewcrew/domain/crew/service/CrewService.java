@@ -1,17 +1,21 @@
 package com.crewcrew.domain.crew.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.data.domain.*;
+import com.crewcrew.domain.crew.enums.ImageType;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.crewcrew.domain.crew.dto.request.*;
-import com.crewcrew.domain.crew.dto.response.*;
-import com.crewcrew.domain.crew.entity.*;
-import com.crewcrew.domain.crew.enums.*;
-import com.crewcrew.domain.crew.repository.*;
+import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
+import com.crewcrew.domain.crew.dto.request.CrewFss;
+import com.crewcrew.domain.crew.dto.response.CrewListResponseDTO;
+import com.crewcrew.domain.crew.dto.response.CrewResponseDTO;
+import com.crewcrew.domain.crew.dto.response.ImageResponseDTO;
+import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.crew.repository.CrewRepository;
+import com.crewcrew.domain.crew.repository.ImageRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
 
@@ -34,6 +38,16 @@ public class CrewService {
     return convertToDTO(savedCrew, images);
   }
 
+  @Transactional(readOnly = true)
+  public Slice<CrewListResponseDTO> getCrew(CrewFss fss, Pageable pageable) {
+    Slice<Crew> entities = crewRepository.findFilteredCrews(fss, pageable);
+    return entities.map(
+        e -> {
+          List<ImageResponseDTO> images = getImagesByCrewId(e.getId());
+          return convertToListDTO(e, images);
+        });
+  }
+
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
     Crew crew =
         Crew.builder()
@@ -52,7 +66,7 @@ public class CrewService {
   private List<ImageResponseDTO> getImagesByCrewId(Long crewId) {
     return imageRepository.findByReferenceIdAndImageType(crewId, ImageType.CREW).stream()
         .map(image -> new ImageResponseDTO(image.getImagePath()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private CrewResponseDTO convertToDTO(Crew crew, List<ImageResponseDTO> images) {
@@ -67,6 +81,25 @@ public class CrewService {
         crew.getCapacity(),
         images,
         crew.getMember().getId());
+  }
+
+  private CrewListResponseDTO convertToListDTO(Crew crew, List<ImageResponseDTO> images) {
+    return new CrewListResponseDTO(
+        crew.getId(),
+        crew.getType(),
+        crew.getSubType(),
+        crew.getName(),
+        crew.getDescription(),
+        crew.getLocation(),
+        crew.getDetailedLocation(),
+        crew.getParticipantCount(),
+        crew.getCapacity(),
+        images,
+        crew.getMember().getId(),
+        crew.getCreatedAt(),
+        crew.getUpdatedAt(),
+        crew.getCanceledAt(),
+        crew.getIsConfirmed());
   }
 
   private Member findMemberById(Long memberId) {
