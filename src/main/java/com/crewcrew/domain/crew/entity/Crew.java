@@ -46,12 +46,14 @@ public class Crew extends BaseEntity {
   @Column(nullable = false)
   private int capacity;
 
+  @Builder.Default
   @Column(name = "participant_count")
   private int participantCount = 0;
 
   @Column(name = "canceled_at", nullable = true)
   private LocalDateTime canceledAt;
 
+  @Builder.Default
   @Column(name = "is_confirmed")
   private Boolean isConfirmed = false;
 
