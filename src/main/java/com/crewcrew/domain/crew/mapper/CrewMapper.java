@@ -37,7 +37,8 @@ public class CrewMapper {
         crew.getParticipantCount(),
         crew.getCapacity(),
         images,
-        crew.getMember().getId());
+        crew.getMember().getId(),
+        crew.getIsConfirmed());
   }
 
   public CrewListResponseDTO crewListResponseDTO(Crew crew, List<ImageResponseDTO> images) {

@@ -16,4 +16,5 @@ public record CrewResponseDTO(
     int participantCount,
     int capacity,
     List<ImageResponseDTO> images,
-    long createdBy) {}
+    long createdBy,
+    boolean isConfirmed) {}

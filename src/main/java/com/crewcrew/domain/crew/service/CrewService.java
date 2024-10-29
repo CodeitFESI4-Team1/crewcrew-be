@@ -108,6 +108,17 @@ public class CrewService {
     crew.incrementParticipantCount();
   }
 
+  @Transactional
+  public CrewResponseDTO cancelCrew(Long id) {
+    Crew crew = findCrewById(id);
+    validateCrewOwner(id);
+    crew.cancel();
+    crewRepository.save(crew);
+
+    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
+    return mapper.crewResponseDTO(crew, images);
+  }
+
   private CrewInfo getCrewInfo(Crew crew, Member member) {
     return mapper.crewInfo(crew, member);
   }

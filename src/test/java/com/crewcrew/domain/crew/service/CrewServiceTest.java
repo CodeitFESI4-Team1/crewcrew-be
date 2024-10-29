@@ -152,6 +152,27 @@ class CrewServiceTest {
     assertThat(crewInfos.get(0).getMember().getId()).isEqualTo(MEMBER_ID);
   }
 
+  @Test
+  @DisplayName("주최자가 크루를 취소")
+  void testCancelCrewSuccess() {
+    Long crewId = 1L;
+    Crew existingCrew = createCrew(crewId, "축구 동호회", 5);
+    existingCrew.cancel();
+
+    when(crewRepository.findById(crewId)).thenReturn(Optional.of(existingCrew));
+    when(crewRepository.existsByIdAndMemberId(crewId, MEMBER_ID)).thenReturn(true);
+    when(mapper.crewResponseDTO(any(Crew.class), anyList()))
+        .thenReturn(createCrewResponseDTO(existingCrew));
+
+    CrewResponseDTO response = crewService.cancelCrew(crewId);
+
+    assertThat(response).isNotNull();
+    assertThat(response.crewId()).isEqualTo(existingCrew.getId());
+    assertThat(response.name()).isEqualTo(existingCrew.getName());
+    assertThat(existingCrew.getCanceledAt()).isNotNull();
+    assertThat(response.isConfirmed()).isFalse();
+  }
+
   private CrewInfo createCrewInfo(Crew crew, Member member) {
     return CrewInfo.builder().crew(crew).member(member).joinedAt(LocalDateTime.now()).build();
   }
@@ -238,7 +259,8 @@ class CrewServiceTest {
         crew.getParticipantCount(),
         crew.getCapacity(),
         List.of(new ImageResponseDTO(TEST_IMAGE_PATH)),
-        crew.getMember().getId());
+        crew.getMember().getId(),
+        crew.getIsConfirmed());
   }
 
   private void mockCrewListResponseDTO(Crew crew) {

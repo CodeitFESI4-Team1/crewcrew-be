@@ -68,4 +68,10 @@ public class CrewController {
     crewService.join(id);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
+
+  @PatchMapping("/{id}/cancel")
+  public ResponseEntity<CrewResponseDTO> cancelCrew(@PathVariable Long id) {
+    CrewResponseDTO canceledCrew = crewService.cancelCrew(id);
+    return ResponseEntity.ok(canceledCrew);
+  }
 }
