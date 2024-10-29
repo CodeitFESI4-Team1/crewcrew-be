@@ -13,3 +13,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+jwt:
+  secret:
+    key: ${jwt.secret.key}
+  access:
+    expire: ${jwt.access.expire}
+  refresh:
+    expire: ${jwt.refresh.expire}
+  redis:
+    host: localhost
+    port: 6379
