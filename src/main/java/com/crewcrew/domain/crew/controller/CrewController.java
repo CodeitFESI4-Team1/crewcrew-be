@@ -74,4 +74,10 @@ public class CrewController {
     CrewResponseDTO canceledCrew = crewService.cancelCrew(id);
     return ResponseEntity.ok(canceledCrew);
   }
+
+  @DeleteMapping("/{id}/leave")
+  public ResponseEntity<Void> leaveCrew(@PathVariable Long id) {
+    crewService.leaveCrew(id);
+    return ResponseEntity.ok().build();
+  }
 }
