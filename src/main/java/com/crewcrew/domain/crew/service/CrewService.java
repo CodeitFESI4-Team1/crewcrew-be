@@ -99,6 +99,18 @@ public class CrewService {
     return mapper.crewResponseDTO(crew, images);
   }
 
+  @Transactional
+  public void join(Long crewId) {
+    Crew crew = findCrewById(crewId);
+    CrewInfo crewInfo = getCrewInfo(crew, findMemberById(getMemberId()));
+    crewInfoRepository.save(crewInfo);
+    crew.incrementParticipantCount();
+  }
+
+  private CrewInfo getCrewInfo(Crew crew, Member member) {
+    return mapper.crewInfo(crew, member);
+  }
+
   @Transactional(readOnly = true)
   public List<JoinedParticipantDTO> getParticipantsByCrewId(Long crewId) {
     List<CrewInfo> crewInfos = crewInfoRepository.findByCrewId(crewId);
