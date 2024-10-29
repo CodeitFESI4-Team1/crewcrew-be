@@ -1,9 +1,9 @@
 package com.crewcrew.domain.crew.enums;
 
 public enum Category {
-  AEROBIC,
-  STRENGTH,
-  TEAM_SPORT,
-  INDIVIDUAL_SPORT,
-  YOGA_MEDITATION
+  CARDIO_STRENGTH, // 유산소와 근력
+  FLEXIBILITY, // 유연성
+  BALL_SPORT, // 구기종목
+  MARTIAL_ARTS, // 무술
+  OTHER_SPORTS // 기타
 }
