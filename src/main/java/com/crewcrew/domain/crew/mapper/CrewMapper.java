@@ -78,4 +78,8 @@ public class CrewMapper {
         crew.getIsConfirmed(),
         participants);
   }
+
+  public CrewInfo crewInfo(Crew crew, Member member) {
+    return CrewInfo.builder().crew(crew).member(member).build();
+  }
 }
