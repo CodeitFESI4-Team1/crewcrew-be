@@ -2,6 +2,7 @@ package com.crewcrew.domain.crew.service;
 
 import java.util.List;
 
+import com.crewcrew.domain.crew.enums.ImageType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,7 @@ public class CrewService {
   }
 
   private List<ImageResponseDTO> getImagesByCrewId(Long crewId) {
-    return imageRepository.findByReferenceId(crewId).stream()
+    return imageRepository.findByReferenceIdAndImageType(crewId, ImageType.CREW).stream()
         .map(image -> new ImageResponseDTO(image.getImagePath()))
         .toList();
   }
