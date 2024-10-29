@@ -93,4 +93,9 @@ public class Crew extends BaseEntity {
       }
     }
   }
+
+  public void cancel() {
+    this.canceledAt = LocalDateTime.now();
+    this.isConfirmed = false;
+  }
 }
