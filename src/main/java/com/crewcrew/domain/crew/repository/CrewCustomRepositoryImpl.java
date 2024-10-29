@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.crewcrew.domain.crew.dto.request.CrewFss;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.enums.*;
+import com.crewcrew.domain.member.entity.Member;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -22,6 +23,20 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @AllArgsConstructor
 public class CrewCustomRepositoryImpl implements CrewCustomRepository {
+
+  @Override
+  public Slice<Crew> findByMember(Member member, Pageable pageable) {
+    List<Crew> entities =
+        jpaQueryFactory
+            .selectFrom(crew)
+            .where(crew.member.eq(member))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+    boolean hasNext = entities.size() == pageable.getPageSize();
+    return new SliceImpl<>(entities, pageable, hasNext);
+  }
 
   private final JPAQueryFactory jpaQueryFactory;
 
