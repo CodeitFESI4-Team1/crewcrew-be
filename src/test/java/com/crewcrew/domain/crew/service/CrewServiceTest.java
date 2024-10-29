@@ -2,6 +2,7 @@ package com.crewcrew.domain.crew.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -171,6 +172,22 @@ class CrewServiceTest {
     assertThat(response.name()).isEqualTo(existingCrew.getName());
     assertThat(existingCrew.getCanceledAt()).isNotNull();
     assertThat(response.isConfirmed()).isFalse();
+  }
+
+  @Test
+  @DisplayName("사용자가 크루에서 탈퇴")
+  void testLeaveCrew() {
+    Long crewId = 1L;
+    Crew crew = createCrew(crewId, "축구 동호회", 5);
+    CrewInfo crewInfo = createCrewInfo(crew, member);
+
+    when(crewRepository.findById(crewId)).thenReturn(Optional.of(crew));
+    when(crewInfoRepository.findByCrewId(crewId)).thenReturn(List.of(crewInfo));
+
+    crewService.leaveCrew(crewId);
+
+    verify(crewInfoRepository).deleteByCrewIdAndMemberId(crewId, MEMBER_ID);
+    assertThat(crew.getParticipantCount()).isEqualTo(0);
   }
 
   private CrewInfo createCrewInfo(Crew crew, Member member) {
