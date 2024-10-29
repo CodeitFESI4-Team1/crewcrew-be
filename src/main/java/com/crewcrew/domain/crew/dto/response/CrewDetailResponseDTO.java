@@ -20,5 +20,5 @@ public record CrewDetailResponseDTO(
     LocalDateTime createdDate,
     LocalDateTime updatedDate,
     LocalDateTime canceledAt,
-    boolean isGathering,
+    boolean isConfirmed,
     List<JoinedParticipantDTO> joinedParticipants) {}
