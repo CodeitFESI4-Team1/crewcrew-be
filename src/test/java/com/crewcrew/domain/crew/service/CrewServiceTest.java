@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ class CrewServiceTest {
   @Mock private CrewRepository crewRepository;
   @Mock private MemberRepository memberRepository;
   @Mock private ImageRepository imageRepository;
+  @Mock private CrewInfoRepository crewInfoRepository;
   @Mock private CrewMapper mapper;
 
   @InjectMocks private CrewService crewService;
@@ -128,6 +130,30 @@ class CrewServiceTest {
     assertThat(response.name()).isEqualTo("주말 축구 동호회");
     assertThat(response.description()).isEqualTo("업데이트된 설명");
     assertThat(response.capacity()).isEqualTo(existingCrew.getCapacity());
+  }
+
+  @Test
+  @DisplayName("크루 가입")
+  void testJoinCrew() {
+    Long crewId = 1L;
+    Crew crew = createCrew(crewId, "축구 동호회", 5);
+    Member member = createTestMember();
+    CrewInfo crewInfo = createCrewInfo(crew, member);
+
+    when(crewRepository.findById(crewId)).thenReturn(Optional.of(crew));
+    when(memberRepository.findById(MEMBER_ID)).thenReturn(Optional.of(member));
+    when(crewInfoRepository.findByCrewId(crewId)).thenReturn(List.of(crewInfo));
+
+    crewService.join(crewId);
+
+    List<CrewInfo> crewInfos = crewInfoRepository.findByCrewId(crewId);
+    assertThat(crewInfos).hasSize(1);
+    assertThat(crewInfos.get(0).getCrew().getId()).isEqualTo(crewId);
+    assertThat(crewInfos.get(0).getMember().getId()).isEqualTo(MEMBER_ID);
+  }
+
+  private CrewInfo createCrewInfo(Crew crew, Member member) {
+    return CrewInfo.builder().crew(crew).member(member).joinedAt(LocalDateTime.now()).build();
   }
 
   private CrewCreateRequestDTO createCrewCreateRequest() {
