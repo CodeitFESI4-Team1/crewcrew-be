@@ -12,4 +12,6 @@ public interface CrewCustomRepository {
   Slice<Crew> findFilteredCrews(CrewFss fss, Pageable pageable);
 
   Slice<Crew> findByMember(Member member, Pageable pageable);
+
+  Slice<Crew> findAllById(Iterable<Long> ids, Pageable pageable);
 }
