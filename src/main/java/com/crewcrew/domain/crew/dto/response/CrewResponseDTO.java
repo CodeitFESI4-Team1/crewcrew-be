@@ -10,6 +10,7 @@ public record CrewResponseDTO(
     Category type,
     SubCategory subType,
     String name,
+    String description,
     String location,
     String detailedLocation,
     int participantCount,

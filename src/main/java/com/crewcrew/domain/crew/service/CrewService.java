@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
 import com.crewcrew.domain.crew.dto.request.CrewFss;
+import com.crewcrew.domain.crew.dto.request.CrewUpdateRequestDTO;
 import com.crewcrew.domain.crew.dto.response.*;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.CrewInfo;
@@ -89,6 +90,16 @@ public class CrewService {
     return mapper.crewDetailResponseDTO(crew, images, participants);
   }
 
+  @Transactional
+  public CrewResponseDTO updateCrew(Long id, CrewUpdateRequestDTO request) {
+    Crew crew = findCrewById(id);
+    validateCrewOwner(id);
+    crew.update(request);
+    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
+
+    return mapper.crewResponseDTO(crew, images);
+  }
+
   @Transactional(readOnly = true)
   public List<JoinedParticipantDTO> getParticipantsByCrewId(Long crewId) {
     List<CrewInfo> crewInfos = crewInfoRepository.findByCrewId(crewId);
@@ -102,17 +113,7 @@ public class CrewService {
   }
 
   private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
-    Crew crew =
-        Crew.builder()
-            .location(request.location())
-            .detailedLocation(request.detailedLocation())
-            .type(request.type())
-            .subType(request.subType())
-            .name(request.name())
-            .description(request.description())
-            .capacity(request.capacity())
-            .member(member)
-            .build();
+    Crew crew = mapper.toEntity(request, member);
     return crewRepository.save(crew);
   }
 
@@ -124,6 +125,13 @@ public class CrewService {
 
   private Crew findCrewById(Long id) {
     return crewRepository.findById(id).orElseThrow(() -> new RuntimeException("Crew not found"));
+  }
+
+  private void validateCrewOwner(Long crewId) {
+    Long memberId = getMemberId();
+    if (!crewRepository.existsByIdAndMemberId(crewId, memberId)) {
+      throw new RuntimeException("Unauthorized to modify the crew"); // 임시 예외 처리
+    }
   }
 
   private Member findMemberById(Long memberId) {

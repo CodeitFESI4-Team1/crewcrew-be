@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.crewcrew.domain.crew.entity.Crew;
 
 @Repository
-public interface CrewRepository extends JpaRepository<Crew, Long>, CrewCustomRepository {}
+public interface CrewRepository extends JpaRepository<Crew, Long>, CrewCustomRepository {
+  boolean existsByIdAndMemberId(Long crewId, Long memberId);
+}
