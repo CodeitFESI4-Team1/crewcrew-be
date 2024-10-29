@@ -118,6 +118,13 @@ public class CrewService {
     return mapper.crewResponseDTO(crew, images);
   }
 
+  @Transactional
+  public void leaveCrew(Long id) {
+    Crew crew = findCrewById(id);
+    crewInfoRepository.deleteByCrewIdAndMemberId(id, getMemberId());
+    crew.decrementParticipantCount();
+  }
+
   private CrewInfo getCrewInfo(Crew crew, Member member) {
     return mapper.crewInfo(crew, member);
   }
