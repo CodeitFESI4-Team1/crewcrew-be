@@ -49,4 +49,10 @@ public class CrewController {
     Slice<CrewListResponseDTO> crews = crewService.getJoinedCrew(pageable);
     return ResponseEntity.ok(crews);
   }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<CrewDetailResponseDTO> getCrewDetails(@PathVariable Long id) {
+    CrewDetailResponseDTO crewDetails = crewService.getCrewDetails(id);
+    return ResponseEntity.ok(crewDetails);
+  }
 }
