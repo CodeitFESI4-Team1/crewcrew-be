@@ -3,7 +3,6 @@ package com.crewcrew.domain.crew.service;
 import java.util.Collections;
 import java.util.List;
 
-import com.crewcrew.domain.crew.enums.ImageType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
