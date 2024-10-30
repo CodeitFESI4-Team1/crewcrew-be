@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import com.crewcrew.domain.crew.controller.docs.CrewControllerDocs;
 import com.crewcrew.domain.crew.dto.request.*;
 import com.crewcrew.domain.crew.dto.response.*;
 import com.crewcrew.domain.crew.service.*;
@@ -18,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/crews")
-public class CrewController {
+public class CrewController implements CrewControllerDocs {
   private final CrewService crewService;
 
   @PostMapping
