@@ -71,6 +71,8 @@ spotless {
 tasks.register('updateGitHooks', Copy) {
 	from 'script/pre-commit'
 	into '.git/hooks'
+	// 권한 추가
+	fileMode 0775
 }
 // makeGitHooksExecutable 작업을 OS에 따라 실행 여부 결정
 tasks.register('makeGitHooksExecutable', Exec) {
