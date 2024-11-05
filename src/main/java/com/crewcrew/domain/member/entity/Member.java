@@ -24,17 +24,17 @@ public class Member extends BaseEntity {
   @Schema(description = "사용자 ID")
   private Long id;
 
-  @Column(nullable = false, unique = true, length = 255)
   @Schema(description = "사용자 이메일", required = true)
   private String email;
 
-  @Column(nullable = false)
   @Schema(description = "사용자 비밀번호", required = true)
   private String password;
 
-  @Column(nullable = false)
   @Schema(description = "사용자 이름", required = true)
   private String name;
+
+  @Schema(description = "닉네임", required = true)
+  private String nickName;
 
   @Column(name = "deleted_at", nullable = true)
   @Schema(description = "회원탈퇴 일자")
