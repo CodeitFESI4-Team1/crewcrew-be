@@ -50,12 +50,12 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
+                        "/",
+                        "/health", // /health 엔드포인트 허용
                         "/auths/login",
                         "/auths/signup",
-                        "/health",
                         "/v3/api-docs/**",
-                        "/swagger*/**",
-                        "/")
+                        "/swagger*/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
