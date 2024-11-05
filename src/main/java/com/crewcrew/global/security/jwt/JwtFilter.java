@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
@@ -23,19 +22,11 @@ import lombok.RequiredArgsConstructor;
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtUtil jwtUtil;
-  private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    String requestURI = request.getRequestURI();
-
-    // /health 엔드포인트는 JWT 필터링에서 제외
-    if (pathMatcher.match("/health/**", requestURI)) {
-      filterChain.doFilter(request, response);
-      return;
-    }
 
     try {
       String authorization = request.getHeader("Authorization");
