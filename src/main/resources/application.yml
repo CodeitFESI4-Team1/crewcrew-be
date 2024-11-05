@@ -3,6 +3,8 @@ spring:
     resources:
       add-mappings: false
 
+
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
@@ -30,3 +32,5 @@ jwt:
     expire: ${JWT.ACCESS.EXPIRE}
   refresh:
     expire: ${JWT.REFRESH.EXPIRE}
+server:
+  port: 5000
