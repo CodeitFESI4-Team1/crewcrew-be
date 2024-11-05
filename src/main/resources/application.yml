@@ -16,20 +16,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-
-jwt:
-  secret:
-    key: ${jwt.secret.key}
-  access:
-    expire: ${jwt.access.expire}
-  refresh:
-    expire: ${jwt.refresh.expire}
-
-    
   servlet:
     multipart:
       enabled: true
       max-file-size: 128MB
       max-request-size: 128MB
-

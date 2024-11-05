@@ -1,16 +1,11 @@
 package com.crewcrew.global.config;
 
-
-
-
-
 import java.util.List;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -21,33 +16,6 @@ import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
-
-
-  @Bean
-  public OpenAPI CrewCrewAPI() {
-    Info info =
-        new Info()
-            .title("CrewCrew Server API")
-            .description("CrewCrew Server API 명세서")
-            .version("1.0.0");
-
-    String jwtSchemeName = "JWT TOKEN";
-    SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
-    Components components =
-        new Components()
-            .addSecuritySchemes(
-                jwtSchemeName,
-                new SecurityScheme()
-                    .name(jwtSchemeName)
-                    .type(SecurityScheme.Type.HTTP) // HTTP 방식
-                    .scheme("bearer")
-                    .bearerFormat("JWT"));
-
-    return new OpenAPI()
-        .addServersItem(new Server().url("/"))
-        .info(info)
-        .addSecurityItem(securityRequirement)
-        .components(components);
 
   Server server = new Server().url("http://localhost:8080"); // 임시 로컬
 
@@ -78,6 +46,5 @@ public class SwaggerConfig {
         .pathsToMatch("/crews/**")
         .packagesToScan("com.crewcrew.domain.crew.controller")
         .build();
-
   }
 }
