@@ -21,3 +21,12 @@ spring:
       enabled: true
       max-file-size: 128MB
       max-request-size: 128MB
+
+# jwt
+jwt:
+  secret:
+    key: ${JWT.SECRET.KEY}
+  access:
+    expire: ${JWT.ACCESS.EXPIRE}
+  refresh:
+    expire: ${JWT.REFRESH.EXPIRE}
