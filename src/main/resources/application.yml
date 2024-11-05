@@ -18,6 +18,7 @@ spring:
         format_sql: true
         highlight_sql: true
 
+# jwt
 jwt:
   secret:
     key: ${jwt.secret.key}
