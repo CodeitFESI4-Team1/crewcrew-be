@@ -89,3 +89,8 @@ tasks.register('makeGitHooksExecutable', Exec) {
 tasks.named('compileJava') {
 	dependsOn 'makeGitHooksExecutable'
 }
+
+// ci/cd 를 위한 jar 파일 생성 비활성화
+jar {
+	enabled = false
+}
