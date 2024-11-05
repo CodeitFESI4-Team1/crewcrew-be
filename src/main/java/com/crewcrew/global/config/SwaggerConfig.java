@@ -17,7 +17,7 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class SwaggerConfig {
 
-  Server server = new Server().url("http://localhost:8080"); // 임시 로컬
+  Server server = new Server().url("http://localhost:8080/"); // 임시 로컬
 
   @Bean
   public OpenAPI crewCrewApi() {
@@ -45,6 +45,15 @@ public class SwaggerConfig {
         .group("크루 기능")
         .pathsToMatch("/crews/**")
         .packagesToScan("com.crewcrew.domain.crew.controller")
+        .build();
+  }
+
+  @Bean
+  public GroupedOpenApi member() {
+    return GroupedOpenApi.builder()
+        .group("회원 기능")
+        .pathsToMatch("/auths/**")
+        .packagesToScan("com.crewcrew.domain.member.controller")
         .build();
   }
 }

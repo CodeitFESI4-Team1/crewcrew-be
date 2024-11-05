@@ -196,7 +196,7 @@ class CrewServiceTest {
 
   private CrewCreateRequestDTO createCrewCreateRequest() {
     return new CrewCreateRequestDTO(
-        Category.BALL_SPORTS, SubCategory.SOCCER, "축구 동호회", "재미있는 축구 팀", "강남구 논현로", "운동장", 20);
+        Category.BALL_SPORT, SubCategory.SOCCER, "축구 동호회", "재미있는 축구 팀", "강남구 논현로", "운동장", 20);
   }
 
   private void setupImageRepository(Long crewId) {
@@ -235,7 +235,7 @@ class CrewServiceTest {
         .id(id)
         .name(name)
         .description("재미있는 " + name)
-        .type(Category.BALL_SPORTS)
+        .type(Category.BALL_SPORT)
         .subType(name.equals("축구 동호회") ? SubCategory.SOCCER : SubCategory.BASKETBALL)
         .location("서울특별시")
         .detailedLocation(name.equals("축구 동호회") ? "강남구" : "마포구")
