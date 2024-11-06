@@ -1,5 +1,8 @@
 package com.crewcrew.domain.crew.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -8,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 import com.crewcrew.domain.crew.service.CrewService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
+import com.crewcrew.global.common.dto.PagedResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,5 +85,17 @@ public class CrewController {
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     crewService.leaveCrew(crewId, userDetails.getUsername());
     return ResponseEntity.ok("크루를 탈퇴 했습니다.");
+  }
+
+  @Operation(summary = "참여한 크루 조회", description = "사용자가 참여한 크루 목록을 조회합니다. (크루장인 크루 제외)")
+  @GetMapping("/joined")
+  public ResponseEntity<PagedResponse<JoinedCrewResponse>> getJoinedCrews(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
+          @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    PagedResponse<JoinedCrewResponse> responses =
+        crewService.getJoinedCrews(userDetails.getUsername(), pageable);
+    return ResponseEntity.ok(responses);
   }
 }

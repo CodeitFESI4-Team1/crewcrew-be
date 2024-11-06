@@ -1,5 +1,7 @@
 package com.crewcrew.domain.crew.service;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.MemberCrew;
 import com.crewcrew.domain.crew.enums.MainCategory;
@@ -15,6 +18,7 @@ import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
+import com.crewcrew.global.common.dto.PagedResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,6 +112,11 @@ public class CrewService {
     }
 
     memberCrewRepository.delete(memberCrew);
+  }
+
+  public PagedResponse<JoinedCrewResponse> getJoinedCrews(String email, Pageable pageable) {
+    Slice<JoinedCrewResponse> slice = crewRepository.findJoinedCrews(email, pageable);
+    return new PagedResponse<>(slice.getContent(), slice.hasNext());
   }
 
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
