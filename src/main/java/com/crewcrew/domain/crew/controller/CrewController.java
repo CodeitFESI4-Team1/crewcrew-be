@@ -53,4 +53,11 @@ public class CrewController {
     crewService.joinCrew(crewId, userDetails.getUsername());
     return ResponseEntity.ok("크루에 참여하였습니다.");
   }
+
+  @DeleteMapping("/{crewId}")
+  public ResponseEntity<Void> deleteCrew(
+      @PathVariable Long crewId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    crewService.deleteCrew(crewId, userDetails.getUsername());
+    return ResponseEntity.ok().build();
+  }
 }

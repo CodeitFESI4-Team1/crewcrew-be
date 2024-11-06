@@ -84,6 +84,22 @@ public class CrewService {
     memberCrewRepository.save(memberCrew);
   }
 
+  @Transactional
+  public void deleteCrew(Long crewId, String email) {
+    Crew crew = findCrew(crewId);
+    Member member = findMember(email);
+    MemberCrew memberCrew =
+        memberCrewRepository
+            .findByCrewIdAndMemberId(crewId, member.getId())
+            .orElseThrow(() -> new IllegalArgumentException("크루 멤버가 아닙니다."));
+
+    if (!memberCrew.isCaptain()) {
+      throw new AccessDeniedException("크루장만 크루를 삭제할 수 있습니다.");
+    }
+
+    crewRepository.delete(crew);
+  }
+
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
     if (!crew.getTitle().equals(request.getTitle())
         && crewRepository.existsByTitleAndIdNot(request.getTitle(), crewId)) {
