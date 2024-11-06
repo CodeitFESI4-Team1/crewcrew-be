@@ -60,4 +60,11 @@ public class CrewController {
     crewService.deleteCrew(crewId, userDetails.getUsername());
     return ResponseEntity.ok().build();
   }
+
+  @DeleteMapping("/{crewId}/leave")
+  public ResponseEntity<String> leaveCrew(
+      @PathVariable Long crewId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    crewService.leaveCrew(crewId, userDetails.getUsername());
+    return ResponseEntity.ok("크루를 탈퇴 했습니다.");
+  }
 }

@@ -88,16 +88,26 @@ public class CrewService {
   public void deleteCrew(Long crewId, String email) {
     Crew crew = findCrew(crewId);
     Member member = findMember(email);
-    MemberCrew memberCrew =
-        memberCrewRepository
-            .findByCrewIdAndMemberId(crewId, member.getId())
-            .orElseThrow(() -> new IllegalArgumentException("크루 멤버가 아닙니다."));
+    MemberCrew memberCrew = findMemberCrew(crewId, member);
 
     if (!memberCrew.isCaptain()) {
       throw new AccessDeniedException("크루장만 크루를 삭제할 수 있습니다.");
     }
 
     crewRepository.delete(crew);
+  }
+
+  @Transactional
+  public void leaveCrew(Long crewId, String email) {
+    Crew crew = findCrew(crewId);
+    Member member = findMember(email);
+    MemberCrew memberCrew = findMemberCrew(crewId, member);
+
+    if (memberCrew.isCaptain()) {
+      throw new IllegalStateException("크루장은 크루를 탈퇴할 수 없습니다.");
+    }
+
+    memberCrewRepository.delete(memberCrew);
   }
 
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
@@ -138,5 +148,11 @@ public class CrewService {
     return memberRepository
         .findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("유저정보가 없습니다."));
+  }
+
+  private MemberCrew findMemberCrew(Long crewId, Member member) {
+    return memberCrewRepository
+        .findByCrewIdAndMemberId(crewId, member.getId())
+        .orElseThrow(() -> new IllegalArgumentException("크루 멤버가 아닙니다."));
   }
 }
