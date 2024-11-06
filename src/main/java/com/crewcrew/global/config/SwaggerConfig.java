@@ -43,7 +43,7 @@ public class SwaggerConfig {
   public GroupedOpenApi crew() {
     return GroupedOpenApi.builder()
         .group("크루 기능")
-        .pathsToMatch("/crews/**")
+        .pathsToMatch("/api/crews/**")
         .packagesToScan("com.crewcrew.domain.crew.controller")
         .build();
   }
