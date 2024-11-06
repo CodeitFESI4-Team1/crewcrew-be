@@ -3,8 +3,6 @@ package com.crewcrew.domain.crew.dto.response;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -82,8 +80,6 @@ public class JoinedCrewResponse {
     private final Long id;
     private final String nickname;
     private final String imageUrl;
-
-    @JsonProperty("isCaptain")
     private final boolean isCaptain;
 
     public CrewMemberResponse(Long id, String nickname, String imageUrl, boolean isCaptain) {
