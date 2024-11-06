@@ -1,25 +1,15 @@
 package com.crewcrew.domain.crew.service;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.crewcrew.domain.crew.dto.request.CrewCreateRequestDTO;
-import com.crewcrew.domain.crew.dto.request.CrewFss;
-import com.crewcrew.domain.crew.dto.request.CrewUpdateRequestDTO;
-import com.crewcrew.domain.crew.dto.response.*;
+import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
+import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.entity.Crew;
-import com.crewcrew.domain.crew.entity.CrewInfo;
-import com.crewcrew.domain.crew.enums.ImageType;
-import com.crewcrew.domain.crew.mapper.CrewMapper;
-import com.crewcrew.domain.crew.repository.CrewInfoRepository;
+import com.crewcrew.domain.crew.entity.MemberCrew;
+import com.crewcrew.domain.crew.enums.MemberCrewStatus;
 import com.crewcrew.domain.crew.repository.CrewRepository;
-import com.crewcrew.domain.crew.repository.ImageRepository;
+import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
 
@@ -29,148 +19,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CrewService {
 
   private final CrewRepository crewRepository;
   private final MemberRepository memberRepository;
-  private final ImageRepository imageRepository;
-  private final CrewInfoRepository crewInfoRepository;
-  private final CrewMapper mapper;
+  private final MemberCrewRepository memberCrewRepository;
 
   @Transactional
-  public CrewResponseDTO createCrew(CrewCreateRequestDTO request) {
-    Member member = findMemberById(getMemberId());
-    Crew savedCrew = saveCrew(request, member);
-    List<ImageResponseDTO> images = getImagesByCrewId(savedCrew.getId());
-
-    return mapper.crewResponseDTO(savedCrew, images);
-  }
-
-  @Transactional(readOnly = true)
-  public Slice<CrewListResponseDTO> getCrew(CrewFss fss, Pageable pageable) {
-    Slice<Crew> crewSlice = crewRepository.findFilteredCrews(fss, pageable);
-    return crewSlice.map(
-        e -> {
-          List<ImageResponseDTO> images = getImagesByCrewId(e.getId());
-          return mapper.crewListResponseDTO(e, images);
-        });
-  }
-
-  @Transactional(readOnly = true)
-  public Slice<CrewListResponseDTO> getCreatedCrew(Pageable pageable) {
-    Member member = findMemberById(getMemberId());
-    Slice<Crew> crews = crewRepository.findByMember(member, pageable);
-    return crews.map(e -> mapper.crewListResponseDTO(e, getImagesByCrewId(e.getId())));
-  }
-
-  @Transactional(readOnly = true)
-  public Slice<CrewListResponseDTO> getJoinedCrew(Pageable pageable) {
-    List<Long> crewIds = crewInfoRepository.findCrewIdsByMemberId(getMemberId());
-
-    if (crewIds.isEmpty()) {
-      return new SliceImpl<>(Collections.emptyList(), pageable, false);
-    }
-
-    Slice<Crew> crewSlice = crewRepository.findAllById(crewIds, pageable);
-
-    return crewSlice.map(
-        crew -> {
-          List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
-          return mapper.crewListResponseDTO(crew, images);
-        });
-  }
-
-  @Transactional(readOnly = true)
-  public CrewDetailResponseDTO getCrewDetails(Long id) {
-    Crew crew = findCrewById(id);
-    List<JoinedParticipantDTO> participants = getParticipantsByCrewId(crew.getId());
-    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
-
-    return mapper.crewDetailResponseDTO(crew, images, participants);
-  }
-
-  @Transactional
-  public CrewResponseDTO updateCrew(Long id, CrewUpdateRequestDTO request) {
-    Crew crew = findCrewById(id);
-    validateCrewOwner(id);
-    crew.update(request);
-    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
-
-    return mapper.crewResponseDTO(crew, images);
-  }
-
-  @Transactional
-  public void join(Long crewId) {
-    Crew crew = findCrewById(crewId);
-    CrewInfo crewInfo = getCrewInfo(crew, findMemberById(getMemberId()));
-    crewInfoRepository.save(crewInfo);
-    crew.incrementParticipantCount();
-  }
-
-  @Transactional
-  public CrewResponseDTO cancelCrew(Long id) {
-    Crew crew = findCrewById(id);
-    validateCrewOwner(id);
-    crew.cancel();
+  public void createCrew(CrewCreateRequest request, String email) {
+    validateCrewTitle(request.getTitle());
+    Member member =
+        memberRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("유저정보가 없습니다."));
+    Crew crew = request.toEntity();
     crewRepository.save(crew);
 
-    List<ImageResponseDTO> images = getImagesByCrewId(crew.getId());
-    return mapper.crewResponseDTO(crew, images);
+    MemberCrew memberCrew =
+        MemberCrew.builder()
+            .member(member)
+            .crew(crew)
+            .isCaptain(true)
+            .status(MemberCrewStatus.JOINED)
+            .build();
+
+    memberCrewRepository.save(memberCrew);
   }
 
-  @Transactional
-  public void leaveCrew(Long id) {
-    Crew crew = findCrewById(id);
-    crewInfoRepository.deleteByCrewIdAndMemberId(id, getMemberId());
-    crew.decrementParticipantCount();
-  }
-
-  private CrewInfo getCrewInfo(Crew crew, Member member) {
-    return mapper.crewInfo(crew, member);
-  }
-
-  @Transactional(readOnly = true)
-  public List<JoinedParticipantDTO> getParticipantsByCrewId(Long crewId) {
-    List<CrewInfo> crewInfos = crewInfoRepository.findByCrewId(crewId);
-
-    return crewInfos.stream()
-        .map(
-            crewInfo ->
-                new JoinedParticipantDTO(
-                    crewInfo.getMember().getId(), crewInfo.getMember().getName()))
-        .toList();
-  }
-
-  private Crew saveCrew(CrewCreateRequestDTO request, Member member) {
-    Crew crew = mapper.toEntity(request, member);
-    return crewRepository.save(crew);
-  }
-
-  private List<ImageResponseDTO> getImagesByCrewId(Long crewId) {
-    return imageRepository.findByReferenceIdAndImageType(crewId, ImageType.CREW).stream()
-        .map(image -> new ImageResponseDTO(image.getImagePath()))
-        .toList();
-  }
-
-  private Crew findCrewById(Long id) {
-    return crewRepository.findById(id).orElseThrow(() -> new RuntimeException("Crew not found"));
-  }
-
-  private void validateCrewOwner(Long crewId) {
-    Long memberId = getMemberId();
-    if (!crewRepository.existsByIdAndMemberId(crewId, memberId)) {
-      throw new RuntimeException("Unauthorized to modify the crew"); // 임시 예외 처리
+  private void validateCrewTitle(String title) {
+    if (crewRepository.existsByTitleIgnoreCaseAndSpace(title)) {
+      throw new IllegalArgumentException("이미 존재하는 크루 제목입니다.");
     }
   }
 
-  private Member findMemberById(Long memberId) {
-    return memberRepository
-        .findById(memberId)
-        .orElseThrow(() -> new RuntimeException("Member not found")); // 임시 에러 처리
-  }
-
-  // 임시 처리
-  private Long getMemberId() {
-    return 1L;
+  public CrewDetailResponse getCrewDetail(Long crewId) {
+    return crewRepository.findCrewDetailById(crewId).orElseThrow();
   }
 }
