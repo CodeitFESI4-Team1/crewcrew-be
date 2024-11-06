@@ -32,10 +32,7 @@ public class CrewService {
   @Transactional
   public void createCrew(CrewCreateRequest request, String email) {
     validateCrewTitle(request.getTitle());
-    Member member =
-        memberRepository
-            .findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("유저정보가 없습니다."));
+    Member member = findMember(email);
     Crew crew = request.toEntity();
     crewRepository.save(crew);
 
@@ -50,7 +47,7 @@ public class CrewService {
 
   @Transactional
   public void updateCrew(Long crewId, CrewUpdateRequest request, String email) {
-    Crew crew = crewRepository.findById(crewId).orElseThrow();
+    Crew crew = findCrew(crewId);
 
     validateIsCaptain(crewId, email);
     validateTitle(crewId, request, crew);
@@ -66,6 +63,25 @@ public class CrewService {
         request.getSubLocation(),
         request.getTotalCount(),
         request.getImageUrl());
+  }
+
+  @Transactional
+  public void joinCrew(Long crewId, String email) {
+    Crew crew = findCrew(crewId);
+    Member member = findMember(email);
+
+    if (memberCrewRepository.existsByCrewIdAndMemberId(crewId, member.getId())) {
+      throw new IllegalStateException("이미 참여 중인 크루입니다.");
+    }
+
+    long currentMemberCount = memberCrewRepository.countByCrewId(crewId);
+    if (currentMemberCount >= crew.getTotalCount()) {
+      throw new IllegalStateException("크루 정원이 초과되었습니다.");
+    }
+
+    MemberCrew memberCrew = MemberCrew.builder().member(member).crew(crew).isCaptain(false).build();
+
+    memberCrewRepository.save(memberCrew);
   }
 
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
@@ -94,5 +110,17 @@ public class CrewService {
       throw new IllegalArgumentException(
           String.format("총 인원은 현재 크루원 수(%d명) 이상이어야 합니다.", currentMemberCount));
     }
+  }
+
+  private Crew findCrew(Long crewId) {
+    return crewRepository
+        .findById(crewId)
+        .orElseThrow(() -> new IllegalArgumentException("크루 정보가 없습니다."));
+  }
+
+  private Member findMember(String email) {
+    return memberRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("유저정보가 없습니다."));
   }
 }

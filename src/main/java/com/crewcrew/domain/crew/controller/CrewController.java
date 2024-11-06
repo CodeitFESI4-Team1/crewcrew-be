@@ -39,11 +39,18 @@ public class CrewController {
   }
 
   @PutMapping("/{crewId}")
-  public ResponseEntity<Void> updateCrew(
+  public ResponseEntity<String> updateCrew(
       @PathVariable Long crewId,
       @Validated @RequestBody CrewUpdateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     crewService.updateCrew(crewId, request, userDetails.getUsername());
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok("크루가 성공적으로 수정되었습니다.");
+  }
+
+  @PostMapping("/{crewId}/join")
+  public ResponseEntity<String> joinCrew(
+      @PathVariable Long crewId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    crewService.joinCrew(crewId, userDetails.getUsername());
+    return ResponseEntity.ok("크루에 참여하였습니다.");
   }
 }
