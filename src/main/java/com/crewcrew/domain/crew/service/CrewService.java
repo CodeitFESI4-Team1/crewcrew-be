@@ -7,7 +7,6 @@ import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.MemberCrew;
-import com.crewcrew.domain.crew.enums.MemberCrewStatus;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.member.entity.Member;
@@ -36,13 +35,7 @@ public class CrewService {
     Crew crew = request.toEntity();
     crewRepository.save(crew);
 
-    MemberCrew memberCrew =
-        MemberCrew.builder()
-            .member(member)
-            .crew(crew)
-            .isCaptain(true)
-            .status(MemberCrewStatus.JOINED)
-            .build();
+    MemberCrew memberCrew = MemberCrew.builder().member(member).crew(crew).isCaptain(true).build();
 
     memberCrewRepository.save(memberCrew);
   }

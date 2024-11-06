@@ -7,7 +7,6 @@ import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.QCrew;
 import com.crewcrew.domain.crew.entity.QMemberCrew;
-import com.crewcrew.domain.crew.enums.MemberCrewStatus;
 import com.crewcrew.domain.gathering.QGathering;
 import com.crewcrew.domain.member.entity.QMember;
 import com.querydsl.core.types.Projections;
@@ -48,12 +47,7 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                     QMemberCrew.memberCrew.isCaptain))
             .from(QMemberCrew.memberCrew)
             .join(QMemberCrew.memberCrew.member, QMember.member)
-            .where(
-                QMemberCrew.memberCrew
-                    .crew
-                    .id
-                    .eq(crewId)
-                    .and(QMemberCrew.memberCrew.status.eq(MemberCrewStatus.JOINED)))
+            .where(QMemberCrew.memberCrew.crew.id.eq(crewId))
             .fetch();
 
     Long gatheringCount =

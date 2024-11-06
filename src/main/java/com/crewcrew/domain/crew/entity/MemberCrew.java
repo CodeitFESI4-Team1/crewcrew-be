@@ -2,7 +2,6 @@ package com.crewcrew.domain.crew.entity;
 
 import jakarta.persistence.*;
 
-import com.crewcrew.domain.crew.enums.MemberCrewStatus;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.global.common.domain.BaseEntity;
 
@@ -28,8 +27,4 @@ public class MemberCrew extends BaseEntity {
   private Crew crew;
 
   @Builder.Default private boolean isCaptain = false;
-
-  @Enumerated(EnumType.STRING)
-  @Builder.Default
-  private MemberCrewStatus status = MemberCrewStatus.JOINED;
 }
