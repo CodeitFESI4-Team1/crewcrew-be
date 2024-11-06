@@ -48,4 +48,21 @@ public class Crew extends BaseEntity {
   public void updateImage(String imageUrl) {
     this.imageUrl = imageUrl;
   }
+
+  public void update(
+      String title,
+      MainCategory mainCategory,
+      SubCategory subCategory,
+      String mainLocation,
+      String subLocation,
+      Integer totalCount,
+      String imageUrl) {
+    this.title = title;
+    this.mainCategory = mainCategory;
+    this.subCategory = subCategory;
+    this.mainLocation = mainLocation;
+    this.subLocation = subLocation;
+    this.totalCount = totalCount;
+    this.imageUrl = imageUrl;
+  }
 }

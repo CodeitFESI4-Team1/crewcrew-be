@@ -4,4 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.crewcrew.domain.crew.entity.MemberCrew;
 
-public interface MemberCrewRepository extends JpaRepository<MemberCrew, Long> {}
+public interface MemberCrewRepository extends JpaRepository<MemberCrew, Long> {
+
+  boolean existsByCrewIdAndMemberEmailAndIsCaptainIsTrue(Long crewId, String email);
+
+  long countByCrewId(Long crewId);
+}

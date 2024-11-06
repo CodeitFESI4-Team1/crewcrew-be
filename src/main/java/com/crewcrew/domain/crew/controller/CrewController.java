@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
+import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.service.*;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
@@ -35,5 +36,14 @@ public class CrewController {
   public ResponseEntity<CrewDetailResponse> getCrewDetail(@PathVariable Long crewId) {
     CrewDetailResponse response = crewService.getCrewDetail(crewId);
     return ResponseEntity.ok(response);
+  }
+
+  @PutMapping("/{crewId}")
+  public ResponseEntity<Void> updateCrew(
+      @PathVariable Long crewId,
+      @Validated @RequestBody CrewUpdateRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    crewService.updateCrew(crewId, request, userDetails.getUsername());
+    return ResponseEntity.ok().build();
   }
 }
