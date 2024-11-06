@@ -1,11 +1,9 @@
 package com.crewcrew.domain.member.entity;
 
-import java.time.*;
-import java.util.List;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
-import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.global.common.domain.BaseEntity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,27 +18,25 @@ public class Member extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "member_id")
   @Schema(description = "사용자 ID")
+  @Column(name = "member_id")
   private Long id;
 
-  @Schema(description = "사용자 이메일", required = true)
+  @Schema(description = "사용자 이메일")
   private String email;
 
-  @Schema(description = "사용자 비밀번호", required = true)
+  @Schema(description = "사용자 비밀번호")
   private String password;
 
-  @Schema(description = "사용자 이름", required = true)
+  @Schema(description = "사용자 이름")
   private String name;
 
-  @Schema(description = "닉네임", required = true)
+  @Schema(description = "닉네임")
   private String nickName;
 
-  @Column(name = "deleted_at", nullable = true)
-  @Schema(description = "회원탈퇴 일자")
-  private LocalDateTime deletedAt;
+  private String profileImageUrl;
 
-  @OneToMany(mappedBy = "member")
-  @Schema(description = "사용자가 참여한 크루 목록")
-  private List<Crew> crews;
+  @Schema(description = "회원탈퇴 일자")
+  @Column(name = "deleted_at")
+  private LocalDateTime deletedAt;
 }

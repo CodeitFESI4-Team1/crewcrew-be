@@ -1,0 +1,37 @@
+package com.crewcrew.domain.crew.dto.response;
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class CrewDetailResponse {
+  private Long id;
+  private String title;
+  private String mainLocation;
+  private String subLocation;
+  private int participantCount;
+  private int totalCount;
+  private String imageUrl;
+
+  @JsonProperty("isConfirmed")
+  private boolean isConfirmed;
+
+  private int totalGatheringCount;
+  private List<CrewMemberResponse> crewMembers;
+
+  @Getter
+  @Builder
+  public static class CrewMemberResponse {
+    private Long id;
+    private String nickname;
+    private String imageUrl;
+
+    @JsonProperty("isCaptain")
+    private boolean isCaptain;
+  }
+}

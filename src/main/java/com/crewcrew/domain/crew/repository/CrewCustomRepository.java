@@ -1,17 +1,19 @@
 package com.crewcrew.domain.crew.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import com.crewcrew.domain.crew.dto.request.CrewFss;
-import com.crewcrew.domain.crew.entity.Crew;
-import com.crewcrew.domain.member.entity.Member;
+import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 
 public interface CrewCustomRepository {
+  boolean existsByTitleIgnoreCaseAndSpace(String title);
 
-  Slice<Crew> findFilteredCrews(CrewFss fss, Pageable pageable);
+  Optional<CrewDetailResponse> findCrewDetailById(Long crewId);
 
-  Slice<Crew> findByMember(Member member, Pageable pageable);
+  Slice<JoinedCrewResponse> findJoinedCrews(String email, Pageable pageable);
 
-  Slice<Crew> findAllById(Iterable<Long> ids, Pageable pageable);
+  Slice<JoinedCrewResponse> findCrewsByHost(String email, Pageable pageable);
 }
