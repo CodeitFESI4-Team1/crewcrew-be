@@ -8,7 +8,5 @@ import com.crewcrew.domain.crew.entity.Crew;
 
 @Repository
 public interface CrewRepository extends JpaRepository<Crew, Long>, CrewCustomRepository {
-  boolean existsByIdAndMemberId(Long crewId, Long memberId);
-
   boolean existsByTitleAndIdNot(@Param("title") String title, @Param("crewId") Long crewId);
 }
