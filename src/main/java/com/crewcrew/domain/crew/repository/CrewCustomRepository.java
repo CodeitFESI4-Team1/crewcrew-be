@@ -14,4 +14,6 @@ public interface CrewCustomRepository {
   Optional<CrewDetailResponse> findCrewDetailById(Long crewId);
 
   Slice<JoinedCrewResponse> findJoinedCrews(String email, Pageable pageable);
+
+  Slice<JoinedCrewResponse> findCrewsByHost(String email, Pageable pageable);
 }

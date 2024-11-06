@@ -125,6 +125,52 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
     return new SliceImpl<>(crews, pageable, hasNext);
   }
 
+  @Override
+  public Slice<JoinedCrewResponse> findCrewsByHost(String email, Pageable pageable) {
+    List<JoinedCrewResponse> crews =
+        queryFactory
+            .select(
+                Projections.constructor(
+                    JoinedCrewResponse.class,
+                    QCrew.crew.id,
+                    QCrew.crew.title,
+                    QCrew.crew.mainLocation,
+                    QCrew.crew.subLocation,
+                    JPAExpressions.select(QMemberCrew.memberCrew.count())
+                        .from(QMemberCrew.memberCrew)
+                        .where(QMemberCrew.memberCrew.crew.eq(QCrew.crew)),
+                    QCrew.crew.totalCount,
+                    QCrew.crew.imageUrl,
+                    JPAExpressions.select(QGathering.gathering.count())
+                        .from(QGathering.gathering)
+                        .where(QGathering.gathering.crew.eq(QCrew.crew))))
+            .from(QMemberCrew.memberCrew)
+            .join(QMemberCrew.memberCrew.crew, QCrew.crew)
+            .where(
+                QMemberCrew.memberCrew.member.email.eq(email),
+                QMemberCrew.memberCrew.isCaptain.eq(true))
+            .orderBy(QCrew.crew.createdAt.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)
+            .fetch()
+            .stream()
+            .map(
+                crew -> {
+                  List<JoinedCrewResponse.CrewMemberResponse> members =
+                      getCrewMembers(crew.getId());
+                  return crew.withCrewMembers(members);
+                })
+            .collect(Collectors.toList());
+
+    boolean hasNext = false;
+    if (crews.size() > pageable.getPageSize()) {
+      crews.remove(crews.size() - 1);
+      hasNext = true;
+    }
+
+    return new SliceImpl<>(crews, pageable, hasNext);
+  }
+
   private List<JoinedCrewResponse.CrewMemberResponse> getCrewMembers(Long crewId) {
     return queryFactory
         .select(

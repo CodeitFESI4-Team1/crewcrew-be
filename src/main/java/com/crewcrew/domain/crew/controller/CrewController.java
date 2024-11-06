@@ -98,4 +98,16 @@ public class CrewController {
         crewService.getJoinedCrews(userDetails.getUsername(), pageable);
     return ResponseEntity.ok(responses);
   }
+
+  @Operation(summary = "주최자의 크루 조회", description = "로그인한 사용자가 크루장인 크루 목록을 조회합니다.")
+  @GetMapping("/hosted")
+  public ResponseEntity<PagedResponse<JoinedCrewResponse>> getHostedCrews(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
+          @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    PagedResponse<JoinedCrewResponse> response =
+        crewService.getHostedCrews(userDetails.getUsername(), pageable);
+    return ResponseEntity.ok(response);
+  }
 }

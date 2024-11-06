@@ -119,6 +119,11 @@ public class CrewService {
     return new PagedResponse<>(slice.getContent(), slice.hasNext());
   }
 
+  public PagedResponse<JoinedCrewResponse> getHostedCrews(String email, Pageable pageable) {
+    Slice<JoinedCrewResponse> slice = crewRepository.findCrewsByHost(email, pageable);
+    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+  }
+
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
     if (!crew.getTitle().equals(request.getTitle())
         && crewRepository.existsByTitleAndIdNot(request.getTitle(), crewId)) {
