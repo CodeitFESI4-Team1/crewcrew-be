@@ -33,22 +33,25 @@ public class LoginService {
   @Value("${JWT.REFRESH.EXPIRE}")
   private Long refreshExpirationTime;
 
-  public String issueAccessToken(Long userId) {
-    String accessToken = jwtUtil.createJwt("access", userId, accessExpirationTime * 1000L);
+  public String issueAccessToken(Long userId, String userEmail) {
+    String accessToken =
+        jwtUtil.createJwt("access", userId, userEmail, accessExpirationTime * 1000L);
     return "Bearer " + accessToken;
   }
 
   @Transactional
-  public String issueRefreshToken(Long userId) {
-    String refreshToken = jwtUtil.createJwt("refresh", userId, refreshExpirationTime * 1000L);
+  public String issueRefreshToken(Long userId, String userEmail) {
+    String refreshToken =
+        jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
     saveRefreshToken(userId, refreshToken, refreshExpirationTime);
     return refreshToken;
   }
 
   @Transactional
-  public String reissueRefreshToken(Long userId, String refreshToken) {
+  public String reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
     refreshRepository.deleteByRefreshToken(refreshToken);
-    String newRefreshToken = jwtUtil.createJwt("refresh", userId, refreshExpirationTime * 1000L);
+    String newRefreshToken =
+        jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
     saveRefreshToken(userId, newRefreshToken, refreshExpirationTime);
     return newRefreshToken;
   }

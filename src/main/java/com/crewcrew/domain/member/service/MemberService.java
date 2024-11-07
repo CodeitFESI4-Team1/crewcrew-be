@@ -33,12 +33,12 @@ public class MemberService {
             encoder.encode(requestDto.getPassword()));
     Member savedMember = memberRepository.save(newMember);
 
-    return issueToken(savedMember.getId(), response);
+    return issueToken(savedMember.getId(), savedMember.getEmail(), response);
   }
 
-  private String issueToken(Long memberId, HttpServletResponse response) {
-    String newAccessToken = loginService.issueAccessToken(memberId);
-    String newRefreshToken = loginService.issueRefreshToken(memberId);
+  private String issueToken(Long memberId, String userEmail, HttpServletResponse response) {
+    String newAccessToken = loginService.issueAccessToken(memberId, userEmail);
+    String newRefreshToken = loginService.issueRefreshToken(memberId, userEmail);
 
     response.addHeader("Authorization", newAccessToken);
     return newRefreshToken;
