@@ -1,5 +1,7 @@
 package com.crewcrew.domain.crew.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
@@ -129,7 +131,11 @@ public class CrewService {
   public PagedResponse<CrewListResponse> searchCrews(
       CrewSearchCondition condition, Pageable pageable) {
     Slice<CrewListResponse> slice = crewRepository.searchCrews(condition, pageable);
-    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+
+    List<CrewListResponse> convertedContent =
+        slice.getContent().stream().map(this::convertCategoryToLabel).toList();
+
+    return new PagedResponse<>(convertedContent, slice.hasNext());
   }
 
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
@@ -176,5 +182,21 @@ public class CrewService {
     return memberCrewRepository
         .findByCrewIdAndMemberId(crewId, member.getId())
         .orElseThrow(() -> new IllegalArgumentException("크루 멤버가 아닙니다."));
+  }
+
+  private CrewListResponse convertCategoryToLabel(CrewListResponse crew) {
+    return CrewListResponse.builder()
+        .id(crew.getId())
+        .mainCategory(MainCategory.valueOf(crew.getMainCategory()).getLabel()) // Enum의 label로 변환
+        .subCategory(SubCategory.valueOf(crew.getSubCategory()).getLabel()) // Enum의 label로 변환
+        .title(crew.getTitle())
+        .mainLocation(crew.getMainLocation())
+        .subLocation(crew.getSubLocation())
+        .participantCount(crew.getParticipantCount())
+        .totalCount(crew.getTotalCount())
+        .imageUrl(crew.getImageUrl())
+        .isConfirmed(crew.getIsConfirmed())
+        .totalGatheringCount(crew.getTotalGatheringCount())
+        .build();
   }
 }

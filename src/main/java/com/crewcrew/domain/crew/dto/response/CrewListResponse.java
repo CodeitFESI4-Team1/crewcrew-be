@@ -1,8 +1,5 @@
 package com.crewcrew.domain.crew.dto.response;
 
-import com.crewcrew.domain.crew.enums.MainCategory;
-import com.crewcrew.domain.crew.enums.SubCategory;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class CrewListResponse {
 
   private Long id;
-  private MainCategory mainCategory;
-  private SubCategory subCategory;
+  private String mainCategory;
+  private String subCategory;
   private String title;
   private String mainLocation;
   private String subLocation;

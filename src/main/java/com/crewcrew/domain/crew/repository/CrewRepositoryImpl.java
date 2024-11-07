@@ -190,8 +190,8 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                 Projections.constructor(
                     CrewListResponse.class,
                     QCrew.crew.id,
-                    QCrew.crew.mainCategory,
-                    QCrew.crew.subCategory,
+                    QCrew.crew.mainCategory.stringValue(),
+                    QCrew.crew.subCategory.stringValue(),
                     QCrew.crew.title,
                     QCrew.crew.mainLocation,
                     QCrew.crew.subLocation,
