@@ -27,10 +27,10 @@ public class LoginService {
   private final JwtUtil jwtUtil;
   private final RefreshRepository refreshRepository;
 
-  @Value("${JWT.ACCESS.EXPIRE}")
+  @Value("${JWT_ACCESS_EXPIRE}")
   private Long accessExpirationTime;
 
-  @Value("${JWT.REFRESH.EXPIRE}")
+  @Value("${JWT_REFRESH_EXPIRE}")
   private Long refreshExpirationTime;
 
   public String issueAccessToken(Long userId, String userEmail) {
