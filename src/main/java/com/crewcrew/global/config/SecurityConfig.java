@@ -2,6 +2,7 @@ package com.crewcrew.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,8 +56,23 @@ public class SecurityConfig {
                         "/auths/login",
                         "/auths/signup",
                         "/v3/api-docs/**",
-                        "/swagger*/**")
+                        "/swagger*/**",
+                        "/api/crews/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/crews")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/api/crews/*")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/crews/*/join")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/crews/*")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.DELETE, "/api/crews/*/leave")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/crews/joined")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/crews/hosted")
+                    .authenticated()
                     .anyRequest()
                     .authenticated())
         .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))
