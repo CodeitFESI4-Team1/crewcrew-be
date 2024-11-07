@@ -2,8 +2,6 @@ package com.crewcrew.domain.crew.enums;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Getter;
 
 @Getter
@@ -41,18 +39,13 @@ public enum SubCategory {
   ICE_SKATING("아이스스케이트", "ice_skating", MainCategory.OTHER_SPORTS);
 
   private final String label;
-  @Getter private final String value;
-  @Getter private final MainCategory mainCategory;
+  private final String value;
+  private final MainCategory mainCategory;
 
   SubCategory(String label, String value, MainCategory mainCategory) {
     this.label = label;
     this.value = value;
     this.mainCategory = mainCategory;
-  }
-
-  @JsonValue
-  public String getLabel() {
-    return label;
   }
 
   public static SubCategory fromValue(String value) {

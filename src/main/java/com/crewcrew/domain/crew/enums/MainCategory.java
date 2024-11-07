@@ -3,8 +3,6 @@ package com.crewcrew.domain.crew.enums;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Getter;
 
 @Getter
@@ -58,11 +56,6 @@ public enum MainCategory {
     this.label = label;
     this.value = value;
     this.subCategories = subCategories;
-  }
-
-  @JsonValue
-  public String getLabel() {
-    return label;
   }
 
   public static MainCategory fromValue(String value) {
