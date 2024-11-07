@@ -81,10 +81,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
     Long userId = customUserDetails.getUserId();
+    String userEmail = customUserDetails.getUsername();
 
-    String accessToken = loginService.issueAccessToken(userId);
+    String accessToken = loginService.issueAccessToken(userId, userEmail);
     //        Cookie refreshToken = loginService.issueRefreshToken(userId);
-    String refreshToken = loginService.issueRefreshToken(userId);
+    String refreshToken = loginService.issueRefreshToken(userId, userEmail);
 
     response.addHeader("Authorization", accessToken);
     //        response.addCookie(refreshToken);

@@ -32,5 +32,3 @@ jwt:
     expire: ${JWT.ACCESS.EXPIRE}
   refresh:
     expire: ${JWT.REFRESH.EXPIRE}
-server:
-  port: 5000

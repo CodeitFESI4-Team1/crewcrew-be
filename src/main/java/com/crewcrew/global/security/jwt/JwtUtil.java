@@ -40,6 +40,15 @@ public class JwtUtil {
         .get("userId", Long.class);
   }
 
+  public String getUserEmail(String token) {
+    return Jwts.parser()
+        .verifyWith(secretKey)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("userEmail", String.class);
+  }
+
   public Boolean isExpired(String token) {
     return Jwts.parser()
         .verifyWith(secretKey)
@@ -50,10 +59,11 @@ public class JwtUtil {
         .before(new Date());
   }
 
-  public String createJwt(String category, Long userId, Long expiredMs) {
+  public String createJwt(String category, Long userId, String email, Long expiredMs) {
     return Jwts.builder()
         .claim("category", category)
         .claim("userId", userId)
+        .claim("userEmail", email)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + expiredMs))
         .signWith(secretKey)

@@ -40,8 +40,9 @@ public class JwtFilter extends OncePerRequestFilter {
       if (!category.equals("access")) throw new Exception("INVALID_TOKEN");
 
       Long userId = jwtUtil.getUserId(accessToken);
+      String userEmail = jwtUtil.getUserEmail(accessToken);
 
-      Member tempMember = Member.builder().id(userId).build();
+      Member tempMember = Member.builder().id(userId).email(userEmail).build();
       CustomUserDetails customUserDetails = new CustomUserDetails(tempMember);
 
       Authentication authToken =
