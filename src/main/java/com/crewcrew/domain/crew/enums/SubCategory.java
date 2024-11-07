@@ -2,6 +2,8 @@ package com.crewcrew.domain.crew.enums;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Getter;
 
 @Getter
@@ -39,8 +41,8 @@ public enum SubCategory {
   ICE_SKATING("아이스스케이트", "ice_skating", MainCategory.OTHER_SPORTS);
 
   private final String label;
-  private final String value;
-  private final MainCategory mainCategory;
+  @Getter private final String value;
+  @Getter private final MainCategory mainCategory;
 
   SubCategory(String label, String value, MainCategory mainCategory) {
     this.label = label;
@@ -48,10 +50,22 @@ public enum SubCategory {
     this.mainCategory = mainCategory;
   }
 
+  @JsonValue
+  public String getLabel() {
+    return label;
+  }
+
   public static SubCategory fromValue(String value) {
     return Arrays.stream(values())
         .filter(category -> category.getValue().equals(value))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("잘못된 SubCategory value: " + value));
+  }
+
+  public static SubCategory fromLabel(String label) {
+    return Arrays.stream(values())
+        .filter(category -> category.getLabel().equals(label))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("잘못된 SubCategory label: " + label));
   }
 }

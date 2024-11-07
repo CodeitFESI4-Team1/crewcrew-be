@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
+import com.crewcrew.domain.crew.dto.request.CrewSearchCondition;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.CrewListResponse;
 import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.MemberCrew;
@@ -61,8 +63,8 @@ public class CrewService {
 
     crew.update(
         request.getTitle(),
-        MainCategory.fromValue(request.getMainCategory()),
-        SubCategory.fromValue(request.getSubCategory()),
+        MainCategory.fromLabel(request.getMainCategory()),
+        SubCategory.fromLabel(request.getSubCategory()),
         request.getMainLocation(),
         request.getSubLocation(),
         request.getTotalCount(),
@@ -121,6 +123,12 @@ public class CrewService {
 
   public PagedResponse<JoinedCrewResponse> getHostedCrews(String email, Pageable pageable) {
     Slice<JoinedCrewResponse> slice = crewRepository.findCrewsByHost(email, pageable);
+    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+  }
+
+  public PagedResponse<CrewListResponse> searchCrews(
+      CrewSearchCondition condition, Pageable pageable) {
+    Slice<CrewListResponse> slice = crewRepository.searchCrews(condition, pageable);
     return new PagedResponse<>(slice.getContent(), slice.hasNext());
   }
 

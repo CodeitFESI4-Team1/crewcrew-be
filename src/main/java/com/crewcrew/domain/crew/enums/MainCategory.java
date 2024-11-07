@@ -3,6 +3,8 @@ package com.crewcrew.domain.crew.enums;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.Getter;
 
 @Getter
@@ -58,10 +60,22 @@ public enum MainCategory {
     this.subCategories = subCategories;
   }
 
+  @JsonValue
+  public String getLabel() {
+    return label;
+  }
+
   public static MainCategory fromValue(String value) {
     return Arrays.stream(values())
         .filter(category -> category.getValue().equals(value))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException("잘못된 MainCategory value: " + value));
+  }
+
+  public static MainCategory fromLabel(String label) {
+    return Arrays.stream(values())
+        .filter(category -> category.getLabel().equals(label))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("잘못된 MainCategory label: " + label));
   }
 }

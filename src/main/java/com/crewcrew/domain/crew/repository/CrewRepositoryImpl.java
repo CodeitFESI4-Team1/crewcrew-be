@@ -8,19 +8,30 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
+import com.crewcrew.domain.crew.dto.request.CrewSearchCondition;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.CrewListResponse;
 import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.QCrew;
 import com.crewcrew.domain.crew.entity.QMemberCrew;
+import com.crewcrew.domain.crew.enums.MainCategory;
+import com.crewcrew.domain.crew.enums.SubCategory;
 import com.crewcrew.domain.gathering.QGathering;
 import com.crewcrew.domain.member.entity.QMember;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CrewRepositoryImpl implements CrewCustomRepository {
   private final JPAQueryFactory queryFactory;
@@ -169,6 +180,109 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
     }
 
     return new SliceImpl<>(crews, pageable, hasNext);
+  }
+
+  @Override
+  public Slice<CrewListResponse> searchCrews(CrewSearchCondition condition, Pageable pageable) {
+    List<CrewListResponse> crews =
+        queryFactory
+            .select(
+                Projections.constructor(
+                    CrewListResponse.class,
+                    QCrew.crew.id,
+                    QCrew.crew.mainCategory,
+                    QCrew.crew.subCategory,
+                    QCrew.crew.title,
+                    QCrew.crew.mainLocation,
+                    QCrew.crew.subLocation,
+                    ExpressionUtils.as(
+                        JPAExpressions.select(QMemberCrew.memberCrew.count())
+                            .from(QMemberCrew.memberCrew)
+                            .where(QMemberCrew.memberCrew.crew.eq(QCrew.crew)),
+                        "participantCount"),
+                    QCrew.crew.totalCount,
+                    QCrew.crew.imageUrl,
+                    QCrew.crew.isConfirmed,
+                    ExpressionUtils.as(
+                        JPAExpressions.select(QGathering.gathering.count())
+                            .from(QGathering.gathering)
+                            .where(QGathering.gathering.crew.eq(QCrew.crew)),
+                        "totalGatheringCount")))
+            .from(QCrew.crew)
+            .where(
+                searchKeywordContains(condition.getKeyword()),
+                mainLocationEq(condition.getMainLocation()),
+                categoryEq(condition.getMainCategory(), condition.getSubCategory()))
+            .orderBy(getSortCondition(condition.getSortType()))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
+
+    boolean hasNext = false;
+    if (crews.size() > pageable.getPageSize()) {
+      crews.remove(crews.size() - 1);
+      hasNext = true;
+    }
+
+    return new SliceImpl<>(crews, pageable, hasNext);
+  }
+
+  private BooleanExpression searchKeywordContains(String keyword) {
+    if (StringUtils.isBlank(keyword)) {
+      return null;
+    }
+    return QCrew.crew
+        .title
+        .containsIgnoreCase(keyword)
+        .or(QCrew.crew.mainLocation.containsIgnoreCase(keyword))
+        .or(QCrew.crew.subLocation.containsIgnoreCase(keyword));
+  }
+
+  private BooleanExpression mainLocationEq(String mainLocation) {
+    return StringUtils.isBlank(mainLocation) ? null : QCrew.crew.mainLocation.eq(mainLocation);
+  }
+
+  private BooleanExpression categoryEq(String mainCategoryLabel, String subCategoryLabel) {
+    if (StringUtils.isBlank(mainCategoryLabel) && StringUtils.isBlank(subCategoryLabel)) {
+      return null;
+    }
+
+    BooleanExpression expression = null;
+
+    if (StringUtils.isNotBlank(mainCategoryLabel)) {
+      try {
+        MainCategory mainCategory = MainCategory.fromLabel(mainCategoryLabel);
+        expression = QCrew.crew.mainCategory.eq(mainCategory);
+      } catch (IllegalArgumentException e) {
+        log.warn("Invalid mainCategory label: {}", mainCategoryLabel);
+      }
+    }
+
+    if (StringUtils.isNotBlank(subCategoryLabel)) {
+      try {
+        SubCategory subCategory = SubCategory.fromLabel(subCategoryLabel);
+        BooleanExpression subCategoryExp = QCrew.crew.subCategory.eq(subCategory);
+        expression = expression == null ? subCategoryExp : expression.and(subCategoryExp);
+      } catch (IllegalArgumentException e) {
+        log.warn("Invalid subCategory label: {}", subCategoryLabel);
+      }
+    }
+
+    return expression;
+  }
+
+  private OrderSpecifier<?>[] getSortCondition(CrewSearchCondition.SortType sortType) {
+    if (sortType == CrewSearchCondition.SortType.POPULAR) {
+      return new OrderSpecifier[] {
+        new OrderSpecifier<>(
+            Order.DESC,
+            JPAExpressions.select(QMemberCrew.memberCrew.count())
+                .from(QMemberCrew.memberCrew)
+                .where(QMemberCrew.memberCrew.crew.eq(QCrew.crew))),
+        QCrew.crew.createdAt.desc()
+      };
+    }
+    return new OrderSpecifier[] {QCrew.crew.createdAt.desc()};
   }
 
   private List<JoinedCrewResponse.CrewMemberResponse> getCrewMembers(Long crewId) {

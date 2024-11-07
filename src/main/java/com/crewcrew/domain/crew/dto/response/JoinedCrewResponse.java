@@ -3,21 +3,19 @@ package com.crewcrew.domain.crew.dto.response;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class JoinedCrewResponse {
-  private final Long id;
-  private final String title;
-  private final String mainLocation;
-  private final String subLocation;
-  private final long currentCount;
-  private final int totalCount;
-  private final String imageUrl;
-  private final long totalGathering;
+  private Long id;
+  private String title;
+  private String mainLocation;
+  private String subLocation;
+  private Long currentCount;
+  private Long totalCount;
+  private String imageUrl;
+  private Long totalGathering;
   private final List<CrewMemberResponse> crewMembers;
 
   @Builder
@@ -27,7 +25,7 @@ public class JoinedCrewResponse {
       String mainLocation,
       String subLocation,
       long currentCount,
-      int totalCount,
+      Long totalCount,
       String imageUrl,
       long totalGathering) {
     this(
@@ -48,10 +46,10 @@ public class JoinedCrewResponse {
       String title,
       String mainLocation,
       String subLocation,
-      long currentCount,
-      int totalCount,
+      Long currentCount,
+      Long totalCount,
       String imageUrl,
-      long totalGathering,
+      Long totalGathering,
       List<CrewMemberResponse> crewMembers) {
     this.id = id;
     this.title = title;
@@ -82,8 +80,6 @@ public class JoinedCrewResponse {
     private final Long id;
     private final String nickname;
     private final String imageUrl;
-
-    @JsonProperty("isCaptain")
     private final boolean isCaptain;
 
     public CrewMemberResponse(Long id, String nickname, String imageUrl, boolean isCaptain) {
