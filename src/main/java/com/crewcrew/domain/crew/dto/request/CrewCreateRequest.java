@@ -43,8 +43,8 @@ public class CrewCreateRequest {
   public Crew toEntity() {
     return Crew.builder()
         .title(title)
-        .mainCategory(MainCategory.fromValue(mainCategory))
-        .subCategory(SubCategory.fromValue(subCategory))
+        .mainCategory(MainCategory.fromLabel(mainCategory))
+        .subCategory(SubCategory.fromLabel(subCategory))
         .mainLocation(mainLocation)
         .subLocation(subLocation)
         .totalCount(totalCount)

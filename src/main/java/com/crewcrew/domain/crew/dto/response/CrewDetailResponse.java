@@ -12,12 +12,12 @@ public class CrewDetailResponse {
   private String title;
   private String mainLocation;
   private String subLocation;
-  private int participantCount;
-  private int totalCount;
+  private Integer participantCount;
+  private Integer totalCount;
   private String imageUrl;
   private boolean isConfirmed;
 
-  private int totalGatheringCount;
+  private Integer totalGatheringCount;
   private List<CrewMemberResponse> crewMembers;
 
   @Getter

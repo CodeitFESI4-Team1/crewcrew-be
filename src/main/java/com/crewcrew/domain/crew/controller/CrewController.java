@@ -9,8 +9,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
+import com.crewcrew.domain.crew.dto.request.CrewSearchCondition;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
+import com.crewcrew.domain.crew.dto.response.CrewListResponse;
 import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
 import com.crewcrew.domain.crew.service.CrewService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
@@ -109,5 +111,16 @@ public class CrewController {
     PagedResponse<JoinedCrewResponse> response =
         crewService.getHostedCrews(userDetails.getUsername(), pageable);
     return ResponseEntity.ok(response);
+  }
+
+  @Operation(summary = "크루 목록 조회", description = "조건에 맞는 크루 목록을 검색합니다.")
+  @GetMapping("/search")
+  public ResponseEntity<PagedResponse<CrewListResponse>> searchCrews(
+      @Parameter(description = "검색 조건, sortType = LATEST, POPULAR") @ModelAttribute
+          CrewSearchCondition condition,
+      @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
+          @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok(crewService.searchCrews(condition, pageable));
   }
 }
