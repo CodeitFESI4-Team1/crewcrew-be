@@ -1,10 +1,11 @@
 package com.crewcrew.domain.crew.service;
 
+import static com.crewcrew.global.common.exception.ErrorCode.*;
+
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
 import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.exception.ApiException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +52,14 @@ public class CrewService {
   }
 
   public CrewDetailResponse getCrewDetail(Long crewId) {
-    return crewRepository.findCrewDetailById(crewId).orElseThrow();
+    return crewRepository
+        .findCrewDetailById(crewId)
+        .orElseThrow(() -> new ApiException(CREW_NOT_FOUND));
   }
 
   @Transactional
   public void updateCrew(Long crewId, CrewUpdateRequest request, String email) {
     Crew crew = findCrew(crewId);
-
     validateIsCaptain(crewId, email);
     validateTitle(crewId, request, crew);
 
@@ -79,12 +82,12 @@ public class CrewService {
     Member member = findMember(email);
 
     if (memberCrewRepository.existsByCrewIdAndMemberId(crewId, member.getId())) {
-      throw new IllegalStateException("이미 참여 중인 크루입니다.");
+      throw new ApiException(ALREADY_CREW_MEMBER);
     }
 
     long currentMemberCount = memberCrewRepository.countByCrewId(crewId);
     if (currentMemberCount >= crew.getTotalCount()) {
-      throw new IllegalStateException("크루 정원이 초과되었습니다.");
+      throw new ApiException(CREW_CAPACITY_EXCEEDED);
     }
 
     MemberCrew memberCrew = MemberCrew.builder().member(member).crew(crew).isCaptain(false).build();
@@ -99,7 +102,7 @@ public class CrewService {
     MemberCrew memberCrew = findMemberCrew(crewId, member);
 
     if (!memberCrew.isCaptain()) {
-      throw new AccessDeniedException("크루장만 크루를 삭제할 수 있습니다.");
+      throw new ApiException(CAPTAIN_PERMISSION_DENIED);
     }
 
     crewRepository.delete(crew);
@@ -107,12 +110,11 @@ public class CrewService {
 
   @Transactional
   public void leaveCrew(Long crewId, String email) {
-    Crew crew = findCrew(crewId);
     Member member = findMember(email);
     MemberCrew memberCrew = findMemberCrew(crewId, member);
 
     if (memberCrew.isCaptain()) {
-      throw new IllegalStateException("크루장은 크루를 탈퇴할 수 없습니다.");
+      throw new ApiException(CAPTAIN_LEAVE_DENIED);
     }
 
     memberCrewRepository.delete(memberCrew);
@@ -141,7 +143,7 @@ public class CrewService {
   private void validateTitle(Long crewId, CrewUpdateRequest request, Crew crew) {
     if (!crew.getTitle().equals(request.getTitle())
         && crewRepository.existsByTitleAndIdNot(request.getTitle(), crewId)) {
-      throw new IllegalArgumentException("이미 존재하는 크루 제목입니다.");
+      throw new ApiException(DUPLICATE_CREW_TITLE);
     }
   }
 
@@ -149,46 +151,43 @@ public class CrewService {
     boolean isCaptain =
         memberCrewRepository.existsByCrewIdAndMemberEmailAndIsCaptainIsTrue(crewId, email);
     if (!isCaptain) {
-      throw new AccessDeniedException("크루장만 수정할 수 있습니다.");
+      throw new ApiException(CAPTAIN_PERMISSION_DENIED);
     }
   }
 
   private void validateCrewTitle(String title) {
     if (crewRepository.existsByTitleIgnoreCaseAndSpace(title)) {
-      throw new IllegalArgumentException("이미 존재하는 크루 제목입니다.");
+      throw new ApiException(DUPLICATE_CREW_TITLE);
     }
   }
 
   private void validateTotalCount(long currentMemberCount, int newTotalCount) {
     if (newTotalCount < currentMemberCount) {
-      throw new IllegalArgumentException(
-          String.format("총 인원은 현재 크루원 수(%d명) 이상이어야 합니다.", currentMemberCount));
+      throw new ApiException(INVALID_TOTAL_COUNT);
     }
   }
 
   private Crew findCrew(Long crewId) {
-    return crewRepository
-        .findById(crewId)
-        .orElseThrow(() -> new IllegalArgumentException("크루 정보가 없습니다."));
+    return crewRepository.findById(crewId).orElseThrow(() -> new ApiException(CREW_NOT_FOUND));
   }
 
   private Member findMember(String email) {
     return memberRepository
         .findByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("유저정보가 없습니다."));
+        .orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
   }
 
   private MemberCrew findMemberCrew(Long crewId, Member member) {
     return memberCrewRepository
         .findByCrewIdAndMemberId(crewId, member.getId())
-        .orElseThrow(() -> new IllegalArgumentException("크루 멤버가 아닙니다."));
+        .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
   }
 
   private CrewListResponse convertCategoryToLabel(CrewListResponse crew) {
     return CrewListResponse.builder()
         .id(crew.getId())
-        .mainCategory(MainCategory.valueOf(crew.getMainCategory()).getLabel()) // Enum의 label로 변환
-        .subCategory(SubCategory.valueOf(crew.getSubCategory()).getLabel()) // Enum의 label로 변환
+        .mainCategory(MainCategory.valueOf(crew.getMainCategory()).getLabel())
+        .subCategory(SubCategory.valueOf(crew.getSubCategory()).getLabel())
         .title(crew.getTitle())
         .mainLocation(crew.getMainLocation())
         .subLocation(crew.getSubLocation())
