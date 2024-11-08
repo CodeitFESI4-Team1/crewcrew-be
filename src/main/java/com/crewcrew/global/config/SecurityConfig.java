@@ -50,16 +50,7 @@ public class SecurityConfig {
         .cors(cors -> cors.configure(httpSecurity))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(
-                        "/",
-                        "/health", // /health 엔드포인트 허용
-                        "/auths/login",
-                        "/auths/signup",
-                        "/v3/api-docs/**",
-                        "/swagger*/**",
-                        "/api/crews/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/crews")
+                auth.requestMatchers(HttpMethod.POST, "/api/crews")
                     .authenticated()
                     .requestMatchers(HttpMethod.PUT, "/api/crews/*")
                     .authenticated()
@@ -73,6 +64,16 @@ public class SecurityConfig {
                     .authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/crews/hosted")
                     .authenticated()
+                    .requestMatchers(
+                        "/",
+                        "/health", // /health 엔드포인트 허용
+                        "/auths/login",
+                        "/auths/signup",
+                        "/v3/api-docs/**",
+                        "/swagger*/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/crews/**")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))

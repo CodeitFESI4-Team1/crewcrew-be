@@ -1,11 +1,14 @@
 package com.crewcrew.domain.crew.controller;
 
+import static com.crewcrew.global.common.exception.SecurityUtil.getCurrentUsername;
+
+import jakarta.validation.Valid;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
@@ -36,10 +39,10 @@ public class CrewController {
   @Operation(summary = "크루 생성", description = "새로운 크루를 생성합니다.")
   @PostMapping
   public ResponseEntity<String> createCrew(
-      @Parameter(description = "크루 생성 요청 DTO", required = true) @Validated @RequestBody
+      @Parameter(description = "크루 생성 요청 DTO", required = true) @Valid @RequestBody
           CrewCreateRequest request,
-      @AuthenticationPrincipal CustomUserDetails user) {
-    crewService.createCrew(request, user.getUsername());
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    crewService.createCrew(request, getCurrentUsername(userDetails));
     return ResponseEntity.ok("크루가 생성 되었습니다.");
   }
 
@@ -55,10 +58,10 @@ public class CrewController {
   @PutMapping("/{crewId}")
   public ResponseEntity<String> updateCrew(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
-      @Parameter(description = "크루 수정 요청 DTO", required = true) @Validated @RequestBody
+      @Parameter(description = "크루 수정 요청 DTO", required = true) @Valid @RequestBody
           CrewUpdateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    crewService.updateCrew(crewId, request, userDetails.getUsername());
+    crewService.updateCrew(crewId, request, getCurrentUsername(userDetails));
     return ResponseEntity.ok("크루가 성공적으로 수정되었습니다.");
   }
 
@@ -67,7 +70,7 @@ public class CrewController {
   public ResponseEntity<String> joinCrew(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    crewService.joinCrew(crewId, userDetails.getUsername());
+    crewService.joinCrew(crewId, getCurrentUsername(userDetails));
     return ResponseEntity.ok("크루에 참여하였습니다.");
   }
 
@@ -76,7 +79,7 @@ public class CrewController {
   public ResponseEntity<Void> deleteCrew(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    crewService.deleteCrew(crewId, userDetails.getUsername());
+    crewService.deleteCrew(crewId, getCurrentUsername(userDetails));
     return ResponseEntity.ok().build();
   }
 
@@ -85,7 +88,7 @@ public class CrewController {
   public ResponseEntity<String> leaveCrew(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    crewService.leaveCrew(crewId, userDetails.getUsername());
+    crewService.leaveCrew(crewId, getCurrentUsername(userDetails));
     return ResponseEntity.ok("크루를 탈퇴 했습니다.");
   }
 
@@ -97,7 +100,7 @@ public class CrewController {
           @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable) {
     PagedResponse<JoinedCrewResponse> responses =
-        crewService.getJoinedCrews(userDetails.getUsername(), pageable);
+        crewService.getJoinedCrews(getCurrentUsername(userDetails), pageable);
     return ResponseEntity.ok(responses);
   }
 
@@ -109,7 +112,7 @@ public class CrewController {
           @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable) {
     PagedResponse<JoinedCrewResponse> response =
-        crewService.getHostedCrews(userDetails.getUsername(), pageable);
+        crewService.getHostedCrews(getCurrentUsername(userDetails), pageable);
     return ResponseEntity.ok(response);
   }
 
