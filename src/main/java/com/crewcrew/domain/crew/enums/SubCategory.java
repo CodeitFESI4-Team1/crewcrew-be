@@ -2,6 +2,9 @@ package com.crewcrew.domain.crew.enums;
 
 import java.util.Arrays;
 
+import com.crewcrew.global.common.exception.ApiException;
+import com.crewcrew.global.common.exception.ErrorCode;
+
 import lombok.Getter;
 
 @Getter
@@ -52,13 +55,13 @@ public enum SubCategory {
     return Arrays.stream(values())
         .filter(category -> category.getValue().equals(value))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("잘못된 SubCategory value: " + value));
+        .orElseThrow(() -> new ApiException(ErrorCode.INVALID_SUB_CATEGORY));
   }
 
   public static SubCategory fromLabel(String label) {
     return Arrays.stream(values())
         .filter(category -> category.getLabel().equals(label))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("잘못된 SubCategory label: " + label));
+        .orElseThrow(() -> new ApiException(ErrorCode.INVALID_SUB_CATEGORY));
   }
 }
