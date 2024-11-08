@@ -17,7 +17,7 @@ import com.crewcrew.domain.crew.entity.QCrew;
 import com.crewcrew.domain.crew.entity.QMemberCrew;
 import com.crewcrew.domain.crew.enums.MainCategory;
 import com.crewcrew.domain.crew.enums.SubCategory;
-import com.crewcrew.domain.gathering.QGathering;
+import com.crewcrew.domain.gathering.entity.QGathering;
 import com.crewcrew.domain.member.entity.QMember;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
