@@ -1,11 +1,10 @@
-package com.crewcrew.domain.gathering;
+package com.crewcrew.domain.gathering.entity;
 
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
 import com.crewcrew.domain.crew.entity.Crew;
-import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.global.common.domain.BaseEntity;
 
 import lombok.*;
@@ -24,10 +23,6 @@ public class Gathering extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "crew_id")
   private Crew crew;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "captain_id")
-  private Member captain;
 
   @Column(length = 20, nullable = false)
   private String title;
