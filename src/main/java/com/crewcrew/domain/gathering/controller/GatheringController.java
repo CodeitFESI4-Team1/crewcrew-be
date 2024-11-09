@@ -1,5 +1,8 @@
 package com.crewcrew.domain.gathering.controller;
 
+import static com.crewcrew.global.common.exception.SecurityUtil.getCurrentUsername;
+import static com.crewcrew.global.common.exception.SecurityUtil.getEmailOrNull;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -33,7 +36,7 @@ public class GatheringController {
       @Parameter(description = "약속 생성 요청 DTO", required = true) @Valid @RequestBody
           GatheringCreateRequest request,
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
-    gatheringService.createGathering(crewId, request, userDetails.getUsername());
+    gatheringService.createGathering(crewId, request, getCurrentUsername(userDetails));
     return ResponseEntity.ok("약속이 생성되었습니다.");
   }
 
@@ -46,7 +49,7 @@ public class GatheringController {
       @Parameter(description = "약속 ID", required = true) @PathVariable Long gatheringId,
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
     GatheringDetailResponse response =
-        gatheringService.getGatheringDetail(crewId, gatheringId, userDetails.getUsername());
+        gatheringService.getGatheringDetail(crewId, gatheringId, getEmailOrNull(userDetails));
     return ResponseEntity.ok(response);
   }
 }

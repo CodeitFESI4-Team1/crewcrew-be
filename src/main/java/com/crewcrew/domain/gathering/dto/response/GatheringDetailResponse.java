@@ -18,15 +18,14 @@ public class GatheringDetailResponse {
   private int currentCount;
   private int totalCount;
   private String imageUrl;
-  private boolean isLiked;
-  private boolean isGatheringCaptain;
   private List<ParticipantResponse> participants;
 
-  public static GatheringDetailResponse of(
-      Gathering gathering,
-      boolean isLiked,
-      boolean isGatheringCaptain,
-      List<ParticipantResponse> participants) {
+  @Builder.Default private boolean isParticipant = false;
+  @Builder.Default private boolean isGatheringCaptain = false;
+  @Builder.Default private boolean isLiked = false;
+
+  public static GatheringDetailResponse from(
+      Gathering gathering, List<ParticipantResponse> participants) {
     return GatheringDetailResponse.builder()
         .id(gathering.getId())
         .title(gathering.getTitle())
@@ -36,9 +35,29 @@ public class GatheringDetailResponse {
         .currentCount(participants.size())
         .totalCount(gathering.getTotalCount())
         .imageUrl(gathering.getImageUrl())
-        .isLiked(isLiked)
-        .isGatheringCaptain(isGatheringCaptain)
         .participants(participants)
+        .build();
+  }
+
+  public static GatheringDetailResponse of(
+      Gathering gathering,
+      List<ParticipantResponse> participants,
+      boolean isLiked,
+      boolean isGatheringCaptain,
+      boolean isParticipant) {
+    return GatheringDetailResponse.builder()
+        .id(gathering.getId())
+        .title(gathering.getTitle())
+        .introduce(gathering.getIntroduce())
+        .dateTime(gathering.getDateTime().toString())
+        .location(gathering.getLocation())
+        .currentCount(participants.size())
+        .totalCount(gathering.getTotalCount())
+        .imageUrl(gathering.getImageUrl())
+        .participants(participants)
+        .isParticipant(isParticipant)
+        .isGatheringCaptain(isGatheringCaptain)
+        .isLiked(isLiked)
         .build();
   }
 }
