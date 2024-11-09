@@ -68,6 +68,19 @@ public class GatheringService {
   }
 
   public GatheringDetailResponse getGatheringDetail(Long crewId, Long gatheringId, String email) {
+    Gathering gathering =
+        gatheringRepository
+            .findByIdAndCrewId(gatheringId, crewId)
+            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
+
+    List<GatheringParticipant> participants = participantRepository.findByGatheringId(gatheringId);
+    List<ParticipantResponse> participantResponses =
+        participants.stream().map(p -> ParticipantResponse.from(p.getMember())).toList();
+
+    if (email == null) {
+      return GatheringDetailResponse.from(gathering, participantResponses);
+    }
+
     Member currentMember =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
@@ -75,25 +88,17 @@ public class GatheringService {
         .findByCrewIdAndMemberId(crewId, currentMember.getId())
         .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
 
-    Gathering gathering =
-        gatheringRepository
-            .findByIdAndCrewId(gatheringId, crewId)
-            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
-
     boolean isLiked =
         likeRepository.existsByGatheringIdAndMemberId(gatheringId, currentMember.getId());
-
-    List<GatheringParticipant> participants = participantRepository.findByGatheringId(gatheringId);
-
     boolean isGatheringCaptain =
         participants.stream()
             .anyMatch(
                 p -> p.getMember().getId().equals(currentMember.getId()) && p.isGatheringCaptain());
+    boolean isParticipant =
+        participants.stream().anyMatch(p -> p.getMember().getId().equals(currentMember.getId()));
 
-    List<ParticipantResponse> participantResponses =
-        participants.stream().map(p -> ParticipantResponse.from(p.getMember())).toList();
-
-    return GatheringDetailResponse.of(gathering, isLiked, isGatheringCaptain, participantResponses);
+    return GatheringDetailResponse.of(
+        gathering, participantResponses, isLiked, isGatheringCaptain, isParticipant);
   }
 
   private void validateDateTime(LocalDateTime dateTime) {
