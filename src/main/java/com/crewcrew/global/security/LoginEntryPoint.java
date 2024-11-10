@@ -26,7 +26,12 @@ public class LoginEntryPoint implements AuthenticationEntryPoint {
       HttpServletResponse response,
       AuthenticationException authException)
       throws IOException, ServletException {
-    resolver.resolveException(
-        request, response, null, (Exception) request.getAttribute("exception"));
+
+    Exception exception = (Exception) request.getAttribute("exception");
+    if (exception == null) {
+      exception = authException;
+    }
+
+    resolver.resolveException(request, response, null, exception);
   }
 }
