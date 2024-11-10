@@ -46,4 +46,19 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "ORDER BY g.dateTime DESC")
   List<GatheringListResponse> findAllByCrewId(
       @Param("crewId") Long crewId, @Param("now") LocalDateTime now);
+
+  @Query(
+      "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringListResponse("
+          + "g.id, g.title, g.introduce, g.dateTime, g.location, g.imageUrl, "
+          + "g.totalCount, "
+          + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
+          + "CASE WHEN EXISTS (SELECT 1 FROM GatheringLike gl WHERE gl.gathering = g AND gl.member.id = :memberId) "
+          + "THEN true ELSE false END) "
+          + "FROM Gathering g "
+          + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp WHERE gp.gathering = g "
+          + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = true) "
+          + "AND g.dateTime > :now "
+          + "ORDER BY g.dateTime DESC")
+  List<GatheringListResponse> findAllByMemberAndIsCaptain(
+      @Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 }
