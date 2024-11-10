@@ -32,3 +32,20 @@ jwt:
     expire: ${JWT_ACCESS_EXPIRE}
   refresh:
     expire: ${JWT_REFRESH_EXPIRE}
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: crewcrew
+      path:
+        crew: crew
+        gathering : gathering
+        member : member
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      accessKey: ${AWS_S3_ACCESS_KEY}
+      secretKey: ${AWS_S3_SECRET_ACCESS_KEY}
