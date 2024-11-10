@@ -3,6 +3,8 @@ package com.crewcrew.domain.gathering.controller;
 import static com.crewcrew.global.common.exception.SecurityUtil.getCurrentUsername;
 import static com.crewcrew.global.common.exception.SecurityUtil.getEmailOrNull;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
+import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
 import com.crewcrew.domain.gathering.service.GatheringService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 
@@ -66,5 +69,23 @@ public class GatheringController {
 
     gatheringService.joinGathering(crewId, gatheringId, getCurrentUsername(userDetails));
     return ResponseEntity.ok("약속 참여가 완료되었습니다.");
+  }
+
+  @Operation(
+      summary = "약속 목록 조회",
+      description =
+          """
+                    크루의 모든 약속 목록을 조회합니다.
+                    - 조건: 현재 시간 이후의 약속만 조회됩니다.
+                    - 정렬: 날짜 기준 내림차순 (최신순)
+                    - 기본 정보: 제목, 소개, 일시, 장소, 참여자 수 등
+                    """)
+  @GetMapping
+  public ResponseEntity<List<GatheringListResponse>> getGatheringList(
+      @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    return ResponseEntity.ok(
+        gatheringService.getGatheringList(crewId, getEmailOrNull(userDetails)));
   }
 }

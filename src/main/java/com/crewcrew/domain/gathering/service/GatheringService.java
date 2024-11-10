@@ -14,6 +14,7 @@ import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
+import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
 import com.crewcrew.domain.gathering.dto.response.ParticipantResponse;
 import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.gathering.entity.GatheringParticipant;
@@ -125,6 +126,19 @@ public class GatheringService {
             .build();
 
     participantRepository.save(participant);
+  }
+
+  public List<GatheringListResponse> getGatheringList(Long crewId, String email) {
+    LocalDateTime now = LocalDateTime.now();
+
+    if (email == null) {
+      return gatheringRepository.findAllByCrewId(crewId, now);
+    }
+
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    return gatheringRepository.findAllByCrewIdWithLikeInfo(crewId, member.getId(), now);
   }
 
   private void validateGatheringJoin(Gathering gathering, Long gatheringId, Long memberId) {
