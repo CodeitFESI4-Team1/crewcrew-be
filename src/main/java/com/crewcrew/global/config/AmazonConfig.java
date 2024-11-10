@@ -30,6 +30,18 @@ public class AmazonConfig {
   @Value("${cloud.aws.region.static}")
   private String region;
 
+  @Value("${cloud.aws.s3.bucket}")
+  private String bucket;
+
+  @Value("${cloud.aws.s3.path.crew}")
+  private String crewPath;
+
+  @Value("${cloud.aws.s3.path.gathering}")
+  private String gatheringPath;
+
+  @Value("${cloud.aws.s3.path.member}")
+  private String memberPath;
+
   @PostConstruct
   public void init() {
     this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
