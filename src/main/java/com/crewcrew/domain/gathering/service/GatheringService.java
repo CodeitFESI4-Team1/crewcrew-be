@@ -14,6 +14,7 @@ import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
+import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
 import com.crewcrew.domain.gathering.dto.response.ParticipantResponse;
 import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.gathering.entity.GatheringParticipant;
@@ -99,6 +100,60 @@ public class GatheringService {
 
     return GatheringDetailResponse.of(
         gathering, participantResponses, isLiked, isGatheringCaptain, isParticipant);
+  }
+
+  @Transactional
+  public void joinGathering(Long crewId, Long gatheringId, String email) {
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    memberCrewRepository
+        .findByCrewIdAndMemberId(crewId, member.getId())
+        .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
+
+    Gathering gathering =
+        gatheringRepository
+            .findByIdAndCrewId(gatheringId, crewId)
+            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
+
+    validateGatheringJoin(gathering, gatheringId, member.getId());
+
+    GatheringParticipant participant =
+        GatheringParticipant.builder()
+            .gathering(gathering)
+            .member(member)
+            .isGatheringCaptain(false)
+            .build();
+
+    participantRepository.save(participant);
+  }
+
+  public List<GatheringListResponse> getGatheringList(Long crewId, String email) {
+    LocalDateTime now = LocalDateTime.now();
+
+    if (email == null) {
+      return gatheringRepository.findAllByCrewId(crewId, now);
+    }
+
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    return gatheringRepository.findAllByCrewIdWithLikeInfo(crewId, member.getId(), now);
+  }
+
+  private void validateGatheringJoin(Gathering gathering, Long gatheringId, Long memberId) {
+    if (participantRepository.existsByGatheringIdAndMemberId(gatheringId, memberId)) {
+      throw new ApiException(ALREADY_GATHERING_PARTICIPANT);
+    }
+
+    long currentParticipants = participantRepository.countByGatheringId(gatheringId);
+    if (currentParticipants >= gathering.getTotalCount()) {
+      throw new ApiException(GATHERING_CAPACITY_EXCEEDED);
+    }
+
+    if (gathering.getDateTime().isBefore(LocalDateTime.now())) {
+      throw new ApiException(PAST_GATHERING_JOIN_DENIED);
+    }
   }
 
   private void validateDateTime(LocalDateTime dateTime) {

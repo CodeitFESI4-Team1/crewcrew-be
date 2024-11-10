@@ -10,4 +10,8 @@ import com.crewcrew.domain.gathering.entity.GatheringParticipant;
 @Repository
 public interface GatheringParticipantRepository extends JpaRepository<GatheringParticipant, Long> {
   List<GatheringParticipant> findByGatheringId(Long gatheringId);
+
+  boolean existsByGatheringIdAndMemberId(Long gatheringId, Long memberId);
+
+  long countByGatheringId(Long gatheringId);
 }
