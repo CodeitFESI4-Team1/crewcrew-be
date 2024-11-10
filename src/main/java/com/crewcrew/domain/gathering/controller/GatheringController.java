@@ -97,7 +97,7 @@ public class GatheringController {
                             - 조건: 현재 시간 이후의 약속만 조회됩니다.
                             - 정렬: 날짜 기준 내림차순 (최신순)
                             """)
-  @GetMapping("/me/hosted")
+  @GetMapping("/hosted")
   public ResponseEntity<List<GatheringListResponse>> getMyHostedGatherings(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -113,7 +113,7 @@ public class GatheringController {
                     - 조건: 현재 시간 이후의 약속만 조회됩니다.
                     - 정렬: 날짜 기준 내림차순 (최신순)
                     """)
-  @GetMapping("/me/participated")
+  @GetMapping("/joined")
   public ResponseEntity<List<GatheringListResponse>> getMyParticipatedGatherings(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 

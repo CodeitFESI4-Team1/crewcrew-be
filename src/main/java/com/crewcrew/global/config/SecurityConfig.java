@@ -68,6 +68,10 @@ public class SecurityConfig {
                     .authenticated()
                     .requestMatchers(HttpMethod.POST, "/api/crews/*/gatherings/*/join")
                     .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/crews/*/gatherings/hosted")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/crews/*/gatherings/joined")
+                    .authenticated()
                     .requestMatchers(
                         "/",
                         "/health", // /health 엔드포인트 허용
