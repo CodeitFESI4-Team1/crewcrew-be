@@ -52,4 +52,19 @@ public class GatheringController {
         gatheringService.getGatheringDetail(crewId, gatheringId, getEmailOrNull(userDetails));
     return ResponseEntity.ok(response);
   }
+
+  @Operation(
+      summary = "약속 참여",
+      description = """
+                    크루 내 약속에 참여합니다.
+                    """)
+  @PostMapping("/{gatheringId}/join")
+  public ResponseEntity<String> joinGathering(
+      @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
+      @Parameter(description = "약속 ID", required = true) @PathVariable Long gatheringId,
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    gatheringService.joinGathering(crewId, gatheringId, getCurrentUsername(userDetails));
+    return ResponseEntity.ok("약속 참여가 완료되었습니다.");
+  }
 }

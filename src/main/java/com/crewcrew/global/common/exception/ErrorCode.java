@@ -44,7 +44,8 @@ public enum ErrorCode {
   GATHERING_CAPTAIN_PERMISSION_DENIED(FORBIDDEN, "모임장만 수정/삭제할 수 있습니다."),
   PAST_GATHERING_UPDATE_DENIED(FORBIDDEN, "이미 종료된 모임은 수정할 수 없습니다."),
   GATHERING_CANCELED(BAD_REQUEST, "취소된 모임입니다."),
-  GATHERING_COMPLETED(BAD_REQUEST, "종료된 모임입니다.");
+  GATHERING_COMPLETED(BAD_REQUEST, "종료된 모임입니다."),
+  PAST_GATHERING_JOIN_DENIED(BAD_REQUEST, "지난 약속에는 참여할 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
