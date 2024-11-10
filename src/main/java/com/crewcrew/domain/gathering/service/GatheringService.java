@@ -148,6 +148,13 @@ public class GatheringService {
     return gatheringRepository.findAllByMemberAndIsCaptain(member.getId(), LocalDateTime.now());
   }
 
+  public List<GatheringListResponse> getMyParticipatedGatherings(String email) {
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    return gatheringRepository.findAllParticipatedGatherings(member.getId(), LocalDateTime.now());
+  }
+
   private void validateGatheringJoin(Gathering gathering, Long gatheringId, Long memberId) {
     if (participantRepository.existsByGatheringIdAndMemberId(gatheringId, memberId)) {
       throw new ApiException(ALREADY_GATHERING_PARTICIPANT);

@@ -93,15 +93,31 @@ public class GatheringController {
       summary = "내가 만든 약속 목록 조회",
       description =
           """
-                    로그인한 사용자가 모임장인 약속 목록을 조회합니다.
-                    - 조건: 현재 시간 이후의 약속만 조회됩니다.
-                    - 정렬: 날짜 기준 내림차순 (최신순)
-                    """)
+                            로그인한 사용자가 모임장인 약속 목록을 조회합니다.
+                            - 조건: 현재 시간 이후의 약속만 조회됩니다.
+                            - 정렬: 날짜 기준 내림차순 (최신순)
+                            """)
   @GetMapping("/me/hosted")
   public ResponseEntity<List<GatheringListResponse>> getMyHostedGatherings(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     return ResponseEntity.ok(
         gatheringService.getMyHostedGatherings(getCurrentUsername(userDetails)));
+  }
+
+  @Operation(
+      summary = "내가 참여한 약속 목록 조회",
+      description =
+          """
+                    로그인한 사용자가 참여자로 있는 약속 목록을 조회합니다. (모임장인 약속은 제외)
+                    - 조건: 현재 시간 이후의 약속만 조회됩니다.
+                    - 정렬: 날짜 기준 내림차순 (최신순)
+                    """)
+  @GetMapping("/me/participated")
+  public ResponseEntity<List<GatheringListResponse>> getMyParticipatedGatherings(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    return ResponseEntity.ok(
+        gatheringService.getMyParticipatedGatherings(getCurrentUsername(userDetails)));
   }
 }
