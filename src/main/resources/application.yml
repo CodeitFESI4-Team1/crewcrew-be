@@ -38,6 +38,10 @@ cloud:
   aws:
     s3:
       bucket: crewcrew
+      path:
+        crew: crew
+        gathering : gathering
+        member : member
     region:
       static: ap-northeast-2
     stack:
