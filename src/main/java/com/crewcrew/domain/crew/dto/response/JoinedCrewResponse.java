@@ -24,10 +24,10 @@ public class JoinedCrewResponse {
       String title,
       String mainLocation,
       String subLocation,
-      long currentCount,
+      Long currentCount,
       Long totalCount,
       String imageUrl,
-      long totalGathering) {
+      Long totalGathering) {
     this(
         id,
         title,

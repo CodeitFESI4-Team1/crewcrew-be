@@ -104,7 +104,7 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                     JPAExpressions.select(QMemberCrew.memberCrew.count())
                         .from(QMemberCrew.memberCrew)
                         .where(QMemberCrew.memberCrew.crew.eq(QCrew.crew)),
-                    QCrew.crew.totalCount,
+                    QCrew.crew.totalCount.longValue(),
                     QCrew.crew.imageUrl,
                     JPAExpressions.select(QGathering.gathering.count())
                         .from(QGathering.gathering)
@@ -150,7 +150,7 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                     JPAExpressions.select(QMemberCrew.memberCrew.count())
                         .from(QMemberCrew.memberCrew)
                         .where(QMemberCrew.memberCrew.crew.eq(QCrew.crew)),
-                    QCrew.crew.totalCount,
+                    QCrew.crew.totalCount.longValue(),
                     QCrew.crew.imageUrl,
                     JPAExpressions.select(QGathering.gathering.count())
                         .from(QGathering.gathering)
