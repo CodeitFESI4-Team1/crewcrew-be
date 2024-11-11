@@ -15,6 +15,7 @@ import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
 import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
+import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
 import com.crewcrew.domain.gathering.dto.response.ParticipantResponse;
 import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.gathering.entity.GatheringParticipant;
@@ -141,14 +142,14 @@ public class GatheringService {
     return gatheringRepository.findAllByCrewIdWithLikeInfo(crewId, member.getId(), now);
   }
 
-  public List<GatheringListResponse> getMyHostedGatherings(String email) {
+  public List<MyGatheringListResponse> getMyHostedGatherings(String email) {
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
     return gatheringRepository.findAllByMemberAndIsCaptain(member.getId(), LocalDateTime.now());
   }
 
-  public List<GatheringListResponse> getMyParticipatedGatherings(String email) {
+  public List<MyGatheringListResponse> getMyParticipatedGatherings(String email) {
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
