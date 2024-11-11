@@ -88,4 +88,21 @@ public class GatheringController {
     return ResponseEntity.ok(
         gatheringService.getGatheringList(crewId, getEmailOrNull(userDetails)));
   }
+
+  @Operation(
+      summary = "약속 참여 취소",
+      description =
+          """
+                            로그인한 사용자의 약속 참여를 취소합니다.
+                            - 조건: 크루원이면서 모임 참여자여야 합니다.
+                            - 주최자는 참여 취소가 불가능합니다.
+                            """)
+  @DeleteMapping("/{gatheringId}/leave")
+  public ResponseEntity<String> leaveGatheringParticipation(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "약속 ID") @PathVariable Long gatheringId) {
+
+    gatheringService.leaveGatheringParticipation(getCurrentUsername(userDetails), gatheringId);
+    return ResponseEntity.ok("모임 참여가 취소되었습니다.");
+  }
 }

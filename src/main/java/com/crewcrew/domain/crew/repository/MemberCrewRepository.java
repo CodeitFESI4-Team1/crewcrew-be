@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.MemberCrew;
+import com.crewcrew.domain.member.entity.Member;
 
 public interface MemberCrewRepository extends JpaRepository<MemberCrew, Long> {
 
@@ -22,4 +24,6 @@ public interface MemberCrewRepository extends JpaRepository<MemberCrew, Long> {
   @Modifying
   @Query("DELETE FROM MemberCrew mc WHERE mc.crew.id = :crewId")
   void deleteByCrewId(@Param("crewId") Long crewId);
+
+  Optional<MemberCrew> findByMemberAndCrew(Member member, Crew crew);
 }
