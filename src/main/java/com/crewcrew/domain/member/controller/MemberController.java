@@ -17,6 +17,9 @@ import com.crewcrew.domain.member.service.MemberMapper;
 import com.crewcrew.domain.member.service.MemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Validated
 @Tag(name = "Member", description = "회원 관련 api")
 @Slf4j
-@RequestMapping("/api/auths")
+@RequestMapping("/auths")
 public class MemberController {
 
   private final MemberService memberService;
@@ -34,6 +37,24 @@ public class MemberController {
   @Operation(
       summary = "이메일 회원가입 api",
       description = "헤더의 Authorization에 access 토큰, 바디(쿠키)에 refresh 토큰 반환")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "AUTH_4000 : 잘못된 파라미터 형식입니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "401",
+            description =
+                "AUTH_4010 : 로그인 정보가 잘못되었습니다\n\nAUTH_4011 : 토큰이 존재하지 않습니다\n\nAUTH_4012 : 토큰이 만료되었습니다\n\nAUTH_4013 : 토큰이 올바르지 않습니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description =
+                "COMMON_500 : 서버 에러, 관리자에게 문의하세요\n\nAUTH_5000 : 서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
   @PostMapping("/signup")
   public ResponseEntity<MemberResponse.refreshTokenDto> joinByEmail(
       HttpServletResponse response, @RequestBody @Valid MemberRequest.joinEmailDto requestDto) {
@@ -69,7 +90,6 @@ public class MemberController {
   ResponseEntity<?> updateUser(
       @RequestPart("file") MultipartFile file,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    log.info("File received: {}, userId: {}", file.getOriginalFilename(), userDetails.getUserId());
     memberService.updateUser(file, userDetails.getUserId());
     return ResponseEntity.ok(null);
   }
