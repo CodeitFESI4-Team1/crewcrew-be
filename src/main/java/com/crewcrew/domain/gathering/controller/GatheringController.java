@@ -98,11 +98,32 @@ public class GatheringController {
                             - 주최자는 참여 취소가 불가능합니다.
                             """)
   @DeleteMapping("/{gatheringId}/leave")
-  public ResponseEntity<String> leaveGatheringParticipation(
+  public ResponseEntity<String> cancelGatheringParticipation(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "크루 ID") @PathVariable Long crewId,
       @Parameter(description = "약속 ID") @PathVariable Long gatheringId) {
 
-    gatheringService.leaveGatheringParticipation(getCurrentUsername(userDetails), gatheringId);
+    gatheringService.leaveGatheringParticipation(
+        getCurrentUsername(userDetails), crewId, gatheringId);
     return ResponseEntity.ok("모임 참여가 취소되었습니다.");
+  }
+
+  @Operation(
+      summary = "약속 취소",
+      description =
+          """
+                            모임장이 약속을 취소합니다.
+                            - 조건: 모임장만 취소할 수 있습니다.
+                            - 제한: 이미 시작된 모임은 취소할 수 없습니다.
+                            - 동작: 모임 취소 시 모든 참가자의 참여 정보가 함께 삭제됩니다.
+                            """)
+  @DeleteMapping("/{gatheringId}")
+  public ResponseEntity<Void> deleteGathering(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "크루 ID") @PathVariable Long crewId,
+      @Parameter(description = "약속 ID") @PathVariable Long gatheringId) {
+
+    gatheringService.deleteGathering(getCurrentUsername(userDetails), crewId, gatheringId);
+    return ResponseEntity.noContent().build();
   }
 }

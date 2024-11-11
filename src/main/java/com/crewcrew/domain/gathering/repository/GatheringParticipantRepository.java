@@ -31,4 +31,8 @@ public interface GatheringParticipantRepository extends JpaRepository<GatheringP
   void deleteByCrewIdAndMemberId(@Param("crewId") Long crewId, @Param("memberId") Long memberId);
 
   Optional<GatheringParticipant> findByGatheringAndMember(Gathering gathering, Member member);
+
+  @Modifying
+  @Query("DELETE FROM GatheringLike gl WHERE gl.gathering = :gathering")
+  void deleteByGathering(@Param("gathering") Gathering gathering);
 }

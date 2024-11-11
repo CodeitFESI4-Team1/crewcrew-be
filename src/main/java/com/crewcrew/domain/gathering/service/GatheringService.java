@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.crew.entity.Crew;
+import com.crewcrew.domain.crew.entity.MemberCrew;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
@@ -187,6 +188,74 @@ public class GatheringService {
     return new PagedResponse<>(limitedParticipants, gatherings.hasNext());
   }
 
+  @Transactional
+  public void leaveGatheringParticipation(String email, Long crewId, Long gatheringId) {
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new ApiException(CREW_NOT_FOUND));
+
+    Gathering gathering =
+        gatheringRepository
+            .findById(gatheringId)
+            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
+
+    MemberCrew memberCrew =
+        memberCrewRepository
+            .findByMemberAndCrew(member, gathering.getCrew())
+            .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
+
+    GatheringParticipant participant =
+        participantRepository
+            .findByGatheringAndMember(gathering, member)
+            .orElseThrow(() -> new ApiException(NOT_GATHERING_PARTICIPANT));
+
+    if (participant.isGatheringCaptain()) {
+      throw new ApiException(GATHERING_CAPTAIN_LEAVE_DENIED);
+    }
+
+    if (gathering.getDateTime().isBefore(LocalDateTime.now())) {
+      throw new ApiException(GATHERING_COMPLETED);
+    }
+
+    participantRepository.delete(participant);
+  }
+
+  @Transactional
+  public void deleteGathering(String email, Long crewId, Long gatheringId) {
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new ApiException(CREW_NOT_FOUND));
+
+    Gathering gathering =
+        gatheringRepository
+            .findById(gatheringId)
+            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
+
+    if (!gathering.getCrew().getId().equals(crewId)) {
+      throw new ApiException(GATHERING_NOT_IN_CREW);
+    }
+
+    if (gathering.getDateTime().isBefore(LocalDateTime.now())) {
+      throw new ApiException(GATHERING_COMPLETED);
+    }
+
+    GatheringParticipant captain =
+        participantRepository
+            .findByGatheringAndMember(gathering, member)
+            .orElseThrow(() -> new ApiException(NOT_GATHERING_PARTICIPANT));
+
+    if (!captain.isGatheringCaptain()) {
+      throw new ApiException(GATHERING_CAPTAIN_PERMISSION_DENIED);
+    }
+
+    likeRepository.deleteByGathering(gathering);
+    participantRepository.deleteByGathering(gathering);
+
+    gatheringRepository.delete(gathering);
+  }
+
   private void validateGatheringJoin(Gathering gathering, Long gatheringId, Long memberId) {
     if (participantRepository.existsByGatheringIdAndMemberId(gatheringId, memberId)) {
       throw new ApiException(ALREADY_GATHERING_PARTICIPANT);
@@ -216,35 +285,5 @@ public class GatheringService {
     if (gatheringRepository.existsByCrewIdAndDateTime(crewId, dateTime)) {
       throw new ApiException(DUPLICATE_GATHERING_DATETIME);
     }
-  }
-
-  @Transactional
-  public void leaveGatheringParticipation(String email, Long gatheringId) {
-    Member member =
-        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
-
-    Gathering gathering =
-        gatheringRepository
-            .findById(gatheringId)
-            .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
-
-    memberCrewRepository
-        .findByMemberAndCrew(member, gathering.getCrew())
-        .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
-
-    GatheringParticipant participant =
-        participantRepository
-            .findByGatheringAndMember(gathering, member)
-            .orElseThrow(() -> new ApiException(NOT_GATHERING_PARTICIPANT));
-
-    if (participant.isGatheringCaptain()) {
-      throw new ApiException(GATHERING_CAPTAIN_LEAVE_DENIED);
-    }
-
-    if (gathering.getDateTime().isBefore(LocalDateTime.now())) {
-      throw new ApiException(GATHERING_COMPLETED);
-    }
-
-    participantRepository.delete(participant);
   }
 }

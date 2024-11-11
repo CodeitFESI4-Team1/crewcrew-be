@@ -49,6 +49,7 @@ public enum ErrorCode {
   GATHERING_CANCELED(BAD_REQUEST, "취소된 모임입니다."),
   GATHERING_COMPLETED(BAD_REQUEST, "종료된 모임입니다."),
   NOT_GATHERING_PARTICIPANT(FORBIDDEN, "모임 참여자가 아닙니다."),
+  GATHERING_NOT_IN_CREW(BAD_REQUEST, "해당 크루의 모임이 아닙니다."),
   PAST_GATHERING_JOIN_DENIED(BAD_REQUEST, "지난 약속에는 참여할 수 없습니다."),
 
   // Image
