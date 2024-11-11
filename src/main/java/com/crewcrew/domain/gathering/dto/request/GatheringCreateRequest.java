@@ -23,7 +23,7 @@ public class GatheringCreateRequest {
   @Size(max = 100)
   private String introduce;
 
-  @NotBlank @FutureOrPresent private LocalDateTime dateTime;
+  @FutureOrPresent private LocalDateTime dateTime;
 
   @NotBlank private String location;
 
