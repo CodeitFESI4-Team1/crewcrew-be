@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
 import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
-import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
 import com.crewcrew.domain.gathering.service.GatheringService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 
@@ -88,37 +87,5 @@ public class GatheringController {
 
     return ResponseEntity.ok(
         gatheringService.getGatheringList(crewId, getEmailOrNull(userDetails)));
-  }
-
-  @Operation(
-      summary = "내가 만든 약속 목록 조회",
-      description =
-          """
-                            로그인한 사용자가 모임장인 약속 목록을 조회합니다.
-                            - 조건: 현재 시간 이후의 약속만 조회됩니다.
-                            - 정렬: 날짜 기준 내림차순 (최신순)
-                            """)
-  @GetMapping("/hosted")
-  public ResponseEntity<List<MyGatheringListResponse>> getMyHostedGatherings(
-      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-    return ResponseEntity.ok(
-        gatheringService.getMyHostedGatherings(getCurrentUsername(userDetails)));
-  }
-
-  @Operation(
-      summary = "내가 참여한 약속 목록 조회",
-      description =
-          """
-                    로그인한 사용자가 참여자로 있는 약속 목록을 조회합니다. (모임장인 약속은 제외)
-                    - 조건: 현재 시간 이후의 약속만 조회됩니다.
-                    - 정렬: 날짜 기준 내림차순 (최신순)
-                    """)
-  @GetMapping("/joined")
-  public ResponseEntity<List<MyGatheringListResponse>> getMyParticipatedGatherings(
-      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-    return ResponseEntity.ok(
-        gatheringService.getMyParticipatedGatherings(getCurrentUsername(userDetails)));
   }
 }
