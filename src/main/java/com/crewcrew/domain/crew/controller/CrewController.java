@@ -76,11 +76,11 @@ public class CrewController {
 
   @Operation(summary = "주최자 크루 취소", description = "주최자가 특정 크루를 취소합니다.")
   @DeleteMapping("/{crewId}")
-  public ResponseEntity<Void> deleteCrew(
+  public ResponseEntity<String> deleteCrew(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     crewService.deleteCrew(crewId, getCurrentUsername(userDetails));
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok("크루가 삭제되었습니다.");
   }
 
   @Operation(summary = "사용자 크루 탈퇴", description = "사용자가 특정 크루에서 탈퇴합니다.")
