@@ -69,7 +69,6 @@ public class MemberController {
   ResponseEntity<?> updateUser(
       @RequestPart("file") MultipartFile file,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    log.info("File received: {}, userId: {}", file.getOriginalFilename(), userDetails.getUserId());
     memberService.updateUser(file, userDetails.getUserId());
     return ResponseEntity.ok(null);
   }
