@@ -79,13 +79,13 @@ public class JoinedCrewResponse {
   public static class CrewMemberResponse {
     private final Long id;
     private final String nickname;
-    private final String imageUrl;
+    private final String profileImageUrl;
     private final boolean isCaptain;
 
-    public CrewMemberResponse(Long id, String nickname, String imageUrl, boolean isCaptain) {
+    public CrewMemberResponse(Long id, String nickname, String profileImageUrl, boolean isCaptain) {
       this.id = id;
       this.nickname = nickname;
-      this.imageUrl = imageUrl;
+      this.profileImageUrl = profileImageUrl;
       this.isCaptain = isCaptain;
     }
   }

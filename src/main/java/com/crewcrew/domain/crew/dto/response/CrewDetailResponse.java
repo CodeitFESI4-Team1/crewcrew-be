@@ -25,7 +25,7 @@ public class CrewDetailResponse {
   public static class CrewMemberResponse {
     private Long id;
     private String nickname;
-    private String imageUrl;
+    private String profileImageUrl;
     private boolean isCaptain;
   }
 }
