@@ -45,7 +45,13 @@ public enum ErrorCode {
   PAST_GATHERING_UPDATE_DENIED(FORBIDDEN, "이미 종료된 모임은 수정할 수 없습니다."),
   GATHERING_CANCELED(BAD_REQUEST, "취소된 모임입니다."),
   GATHERING_COMPLETED(BAD_REQUEST, "종료된 모임입니다."),
-  PAST_GATHERING_JOIN_DENIED(BAD_REQUEST, "지난 약속에는 참여할 수 없습니다.");
+  PAST_GATHERING_JOIN_DENIED(BAD_REQUEST, "지난 약속에는 참여할 수 없습니다."),
+
+  // Image
+  IMAGE_REQUIRED(BAD_REQUEST, "이미지 파일은 필수입니다."),
+  IMAGE_SIZE_EXCEEDED(BAD_REQUEST, "이미지 크기는 5MB를 초과할 수 없습니다."),
+  INVALID_IMAGE_TYPE(BAD_REQUEST, "JPG, JPEG, PNG 형식의 이미지만 업로드 가능합니다."),
+  INVALID_IMAGE_FILENAME(BAD_REQUEST, "잘못된 파일명입니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
