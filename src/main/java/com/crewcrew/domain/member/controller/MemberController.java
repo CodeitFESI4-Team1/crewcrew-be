@@ -3,10 +3,12 @@ package com.crewcrew.domain.member.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.dto.MemberRequest;
@@ -17,12 +19,14 @@ import com.crewcrew.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Member", description = "회원 관련 api")
-@RequestMapping("/auths")
+@Slf4j
+@RequestMapping("/api/auths")
 public class MemberController {
 
   private final MemberService memberService;
@@ -58,5 +62,15 @@ public class MemberController {
   public ResponseEntity<MemberResponse.getMemberInfoDto> getUser(
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(memberService.getMemberInfo(userDetails.getUserId()));
+  }
+
+  @Operation(summary = "회원 정보 수정 api", description = "회원 프로필 이미지만 수정 가능합니다.")
+  @PutMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  ResponseEntity<?> updateUser(
+      @RequestPart("file") MultipartFile file,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    log.info("File received: {}, userId: {}", file.getOriginalFilename(), userDetails.getUserId());
+    memberService.updateUser(file, userDetails.getUserId());
+    return ResponseEntity.ok(null);
   }
 }

@@ -5,7 +5,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.crewcrew.domain.image.entity.ImageType;
+import com.crewcrew.domain.image.service.ImageService;
 import com.crewcrew.domain.member.dto.MemberRequest;
 import com.crewcrew.domain.member.dto.MemberResponse;
 import com.crewcrew.domain.member.entity.Member;
@@ -22,6 +25,7 @@ public class MemberService {
   private final LoginService loginService;
   private final MemberRepository memberRepository;
   private final BCryptPasswordEncoder encoder;
+  private final ImageService imageService;
 
   @Transactional
   public String insertMemberByEmail(
@@ -60,5 +64,22 @@ public class MemberService {
         .createdAt(member.getCreatedAt())
         .updatedAt(member.getUpdatedAt())
         .build();
+  }
+
+  @Transactional
+  public void updateUser(MultipartFile file, Long userId) {
+    Member member =
+        memberRepository
+            .findById(userId)
+            .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
+
+    String profileImageUrl = imageService.uploadImage(ImageType.MEMBER, file);
+
+    member.update(
+        member.getEmail(),
+        member.getPassword(),
+        member.getNickName(),
+        profileImageUrl,
+        member.getDeletedAt());
   }
 }

@@ -14,6 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.entity.Member;
+import com.crewcrew.global.common.exception.ApiException;
+import com.crewcrew.global.common.exception.ErrorCode;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +32,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
     try {
       String authorization = request.getHeader("Authorization");
-      if (authorization == null || !authorization.startsWith("Bearer "))
-        throw new Exception("NOT_FOUND_TOKEN");
+
+      if (authorization == null || !authorization.startsWith("Bearer ")) {
+        throw new ApiException(ErrorCode.USER_NOT_FOUND);
+      }
 
       String accessToken = authorization.split(" ")[1];
       jwtUtil.isExpired(accessToken);
 
       String category = jwtUtil.getCategory(accessToken);
-      if (!category.equals("access")) throw new Exception("INVALID_TOKEN");
+      if (!category.equals("access")) throw new ApiException(ErrorCode.INVALID_TOKEN);
 
       Long userId = jwtUtil.getUserId(accessToken);
       String userEmail = jwtUtil.getUserEmail(accessToken);
@@ -51,9 +55,9 @@ public class JwtFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(authToken);
 
     } catch (ExpiredJwtException e) {
-      request.setAttribute("exception", new Exception("EXPIRED_TOKEN"));
+      request.setAttribute("exception", new ApiException(ErrorCode.EXPIRED_TOKEN));
     } catch (Exception e) {
-      request.setAttribute("exception", new Exception("INVALID_TOKEN"));
+      request.setAttribute("exception", new ApiException(ErrorCode.INVALID_TOKEN));
     }
 
     filterChain.doFilter(request, response);
