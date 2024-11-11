@@ -13,8 +13,6 @@ public class MemberRequest {
   public static class joinEmailDto {
     @NotBlank @Email @ExistEmail String email;
 
-    @NotBlank String name;
-
     @NotBlank String nickName;
 
     @NotBlank String password;
