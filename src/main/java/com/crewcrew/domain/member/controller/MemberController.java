@@ -3,6 +3,7 @@ package com.crewcrew.domain.member.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,32 +40,43 @@ public class MemberController {
       description = "헤더의 Authorization에 access 토큰, 바디(쿠키)에 refresh 토큰 반환")
   @ApiResponses(
       value = {
-        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(responseCode = "201", description = "생성됨"),
         @ApiResponse(
             responseCode = "400",
-            description = "AUTH_4000 : 잘못된 파라미터 형식입니다",
+            description = "유효하지 않은 입력값입니다.\n\n이미 존재하는 이메일입니다.",
             content = {@Content()}),
         @ApiResponse(
             responseCode = "401",
-            description =
-                "AUTH_4010 : 로그인 정보가 잘못되었습니다\n\nAUTH_4011 : 토큰이 존재하지 않습니다\n\nAUTH_4012 : 토큰이 만료되었습니다\n\nAUTH_4013 : 토큰이 올바르지 않습니다",
+            description = "토큰이 만료되었습니다\n\n토큰이 올바르지 않습니다",
             content = {@Content()}),
         @ApiResponse(
             responseCode = "500",
-            description =
-                "COMMON_500 : 서버 에러, 관리자에게 문의하세요\n\nAUTH_5000 : 서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
             content = {@Content()})
       })
   @PostMapping("/signup")
   public ResponseEntity<MemberResponse.refreshTokenDto> joinByEmail(
       HttpServletResponse response, @RequestBody @Valid MemberRequest.joinEmailDto requestDto) {
     String refreshToken = memberService.insertMemberByEmail(response, requestDto);
-    return ResponseEntity.ok(MemberMapper.toRefreshToken(refreshToken));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(MemberMapper.toRefreshToken(refreshToken));
   }
 
   @Operation(
       summary = "이메일 로그인 api",
       description = "헤더의 Authorization에 access 토큰, 바디(쿠키)에 refresh 토큰 반환")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "유효하지 않은 입력값입니다.",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody MemberRequest.loginDto request) {
     // Filter에서 작동하지만, Swagger 위해서 틀만 작성
@@ -72,6 +84,22 @@ public class MemberController {
   }
 
   @Operation(summary = "로그아웃 api", description = "Cookie에 refresh 토큰 필요")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "유효하지 않은 입력값입니다.",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "401",
+            description = "토큰이 만료되었습니다\n\n토큰이 올바르지 않습니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
   @PostMapping("/logout")
   public ResponseEntity<?> logout() {
     // Filter에서 작동하지만, Swagger 위해서 틀만 작성
@@ -79,6 +107,22 @@ public class MemberController {
   }
 
   @Operation(summary = "회원 정보 확인 api")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "401",
+            description = "토큰이 만료되었습니다\n\n토큰이 올바르지 않습니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "회원 정보를 찾을 수 없습니다.",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
   @GetMapping("/user")
   public ResponseEntity<MemberResponse.getMemberInfoDto> getUser(
       @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -86,6 +130,22 @@ public class MemberController {
   }
 
   @Operation(summary = "회원 정보 수정 api", description = "회원 프로필 이미지만 수정 가능합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "401",
+            description = "토큰이 만료되었습니다\n\n토큰이 올바르지 않습니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "404",
+            description = "회원 정보를 찾을 수 없습니다.",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
   @PutMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<?> updateUser(
       @RequestPart("file") MultipartFile file,
