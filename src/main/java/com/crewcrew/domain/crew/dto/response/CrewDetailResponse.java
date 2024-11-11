@@ -2,9 +2,13 @@ package com.crewcrew.domain.crew.dto.response;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Builder
 public class CrewDetailResponse {
@@ -22,6 +26,8 @@ public class CrewDetailResponse {
 
   @Getter
   @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class CrewMemberResponse {
     private Long id;
     private String nickname;
