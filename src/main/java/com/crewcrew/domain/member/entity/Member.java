@@ -31,6 +31,7 @@ public class Member extends BaseEntity {
   @Schema(description = "닉네임")
   private String nickName;
 
+  @Schema(description = "프로필 이미지")
   private String profileImageUrl;
 
   @Schema(description = "회원탈퇴 일자")

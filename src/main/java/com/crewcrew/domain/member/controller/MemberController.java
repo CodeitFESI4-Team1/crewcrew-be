@@ -4,12 +4,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.dto.MemberRequest;
 import com.crewcrew.domain.member.dto.MemberResponse;
 import com.crewcrew.domain.member.service.MemberMapper;
@@ -52,5 +51,12 @@ public class MemberController {
   public ResponseEntity<?> logout() {
     // Filter에서 작동하지만, Swagger 위해서 틀만 작성
     return ResponseEntity.ok(null);
+  }
+
+  @Operation(summary = "회원 정보 확인 api")
+  @GetMapping("/user")
+  public ResponseEntity<MemberResponse.getMemberInfoDto> getUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(memberService.getMemberInfo(userDetails.getUserId()));
   }
 }

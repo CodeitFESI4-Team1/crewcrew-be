@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.member.dto.MemberRequest;
+import com.crewcrew.domain.member.dto.MemberResponse;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
+import com.crewcrew.global.common.exception.ApiException;
+import com.crewcrew.global.common.exception.ErrorCode;
 import com.crewcrew.global.security.LoginService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,5 +42,23 @@ public class MemberService {
 
     response.addHeader("Authorization", newAccessToken);
     return newRefreshToken;
+  }
+
+  @Transactional
+  public MemberResponse.getMemberInfoDto getMemberInfo(Long userId) {
+    Member member =
+        memberRepository
+            .findById(userId)
+            .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
+
+    return MemberResponse.getMemberInfoDto
+        .builder()
+        .id(member.getId())
+        .email(member.getEmail())
+        .nickname(member.getNickName())
+        .profileImageUrl(member.getProfileImageUrl())
+        .createdAt(member.getCreatedAt())
+        .updatedAt(member.getUpdatedAt())
+        .build();
   }
 }
