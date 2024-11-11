@@ -1,5 +1,6 @@
 package com.crewcrew.domain.image.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +25,12 @@ public class ImageController {
   private final ImageService imageService;
 
   @Operation(summary = "이미지 업로드", description = "멤버/크루/모임에 사용될 이미지를 업로드합니다.")
-  @PostMapping
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ImageUploadResponse> uploadImage(
       @Parameter(description = "이미지 타입(MEMBER/CREW/GATHERING)", required = true)
           @RequestParam("type")
           ImageType type,
-      @Parameter(description = "이미지 파일", required = true) @RequestParam("file")
+      @Parameter(description = "이미지 파일(JPEG/JPG/PNG)", required = true) @RequestParam("file")
           MultipartFile file) {
 
     String imageUrl = imageService.uploadImage(type, file);
