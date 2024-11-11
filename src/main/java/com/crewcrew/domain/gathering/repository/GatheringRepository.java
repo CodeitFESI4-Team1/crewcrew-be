@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
+import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
 import com.crewcrew.domain.gathering.entity.Gathering;
 
 @Repository
@@ -49,10 +50,11 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
       @Param("crewId") Long crewId, @Param("now") LocalDateTime now);
 
   @Query(
-      "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringListResponse("
-          + "g.id, g.title, g.introduce, g.dateTime, g.location, g.imageUrl, "
-          + "g.totalCount, "
+      "SELECT new com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse("
+          + "g.id, g.crew.id, g.crew.title, g.crew.mainLocation, g.crew.subLocation, "
+          + "g.title, g.introduce, g.dateTime, g.location, g.imageUrl, "
           + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
+          + "g.totalCount, "
           + "CASE WHEN EXISTS (SELECT 1 FROM GatheringLike gl WHERE gl.gathering = g AND gl.member.id = :memberId) "
           + "THEN true ELSE false END) "
           + "FROM Gathering g "
@@ -60,14 +62,15 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = true) "
           + "AND g.dateTime > :now "
           + "ORDER BY g.dateTime DESC")
-  List<GatheringListResponse> findAllByMemberAndIsCaptain(
+  List<MyGatheringListResponse> findAllByMemberAndIsCaptain(
       @Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
   @Query(
-      "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringListResponse("
-          + "g.id, g.title, g.introduce, g.dateTime, g.location, g.imageUrl, "
-          + "g.totalCount, "
+      "SELECT new com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse("
+          + "g.id, g.crew.id, g.crew.title, g.crew.mainLocation, g.crew.subLocation, "
+          + "g.title, g.introduce, g.dateTime, g.location, g.imageUrl, "
           + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
+          + "g.totalCount, "
           + "CASE WHEN EXISTS (SELECT 1 FROM GatheringLike gl WHERE gl.gathering = g AND gl.member.id = :memberId) "
           + "THEN true ELSE false END) "
           + "FROM Gathering g "
@@ -75,7 +78,7 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = false) "
           + "AND g.dateTime > :now "
           + "ORDER BY g.dateTime DESC")
-  List<GatheringListResponse> findAllParticipatedGatherings(
+  List<MyGatheringListResponse> findAllParticipatedGatherings(
       @Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
   @Modifying

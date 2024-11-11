@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
 import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
 import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
+import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
 import com.crewcrew.domain.gathering.service.GatheringService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 
@@ -98,7 +99,7 @@ public class GatheringController {
                             - 정렬: 날짜 기준 내림차순 (최신순)
                             """)
   @GetMapping("/hosted")
-  public ResponseEntity<List<GatheringListResponse>> getMyHostedGatherings(
+  public ResponseEntity<List<MyGatheringListResponse>> getMyHostedGatherings(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     return ResponseEntity.ok(
@@ -114,7 +115,7 @@ public class GatheringController {
                     - 정렬: 날짜 기준 내림차순 (최신순)
                     """)
   @GetMapping("/joined")
-  public ResponseEntity<List<GatheringListResponse>> getMyParticipatedGatherings(
+  public ResponseEntity<List<MyGatheringListResponse>> getMyParticipatedGatherings(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     return ResponseEntity.ok(
