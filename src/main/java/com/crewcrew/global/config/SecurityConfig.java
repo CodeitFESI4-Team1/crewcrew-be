@@ -82,12 +82,12 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/",
                         "/health", // /health 엔드포인트 허용
-                        "/auths/login",
-                        "/auths/signup",
                         "/v3/api-docs/**",
                         "/swagger*/**")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/crews/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auths/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
