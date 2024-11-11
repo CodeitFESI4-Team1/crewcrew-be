@@ -21,6 +21,9 @@ import com.crewcrew.domain.crew.enums.MainCategory;
 import com.crewcrew.domain.crew.enums.SubCategory;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
+import com.crewcrew.domain.gathering.repository.GatheringParticipantRepository;
+import com.crewcrew.domain.gathering.repository.GatheringRepository;
+import com.crewcrew.domain.like.repository.GatheringLikeRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
 import com.crewcrew.global.common.dto.PagedResponse;
@@ -38,6 +41,9 @@ public class CrewService {
   private final CrewRepository crewRepository;
   private final MemberRepository memberRepository;
   private final MemberCrewRepository memberCrewRepository;
+  private final GatheringLikeRepository gatheringLikeRepository;
+  private final GatheringRepository gatheringRepository;
+  private final GatheringParticipantRepository gatheringParticipantRepository;
 
   @Transactional
   public void createCrew(CrewCreateRequest request, String email) {
@@ -104,7 +110,10 @@ public class CrewService {
     if (!memberCrew.isCaptain()) {
       throw new ApiException(CAPTAIN_PERMISSION_DENIED);
     }
-
+    gatheringLikeRepository.deleteByGatheringCrewId(crewId);
+    gatheringParticipantRepository.deleteByGatheringCrewId(crewId);
+    memberCrewRepository.deleteByCrewId(crewId);
+    gatheringRepository.deleteByCrewId(crewId);
     crewRepository.delete(crew);
   }
 
@@ -117,6 +126,7 @@ public class CrewService {
       throw new ApiException(CAPTAIN_LEAVE_DENIED);
     }
 
+    gatheringParticipantRepository.deleteByCrewIdAndMemberId(crewId, member.getId());
     memberCrewRepository.delete(memberCrew);
   }
 
