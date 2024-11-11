@@ -17,6 +17,7 @@ public enum ErrorCode {
 
   // Member
   MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
+  DUPLICATE_MEMBER_EMAIL(CONFLICT, "이미 존재하는 이메일입니다."),
 
   // Crew
   CREW_NOT_FOUND(NOT_FOUND, "크루 정보를 찾을 수 없습니다."),

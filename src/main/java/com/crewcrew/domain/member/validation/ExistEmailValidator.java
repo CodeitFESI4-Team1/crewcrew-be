@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.crewcrew.domain.member.annotation.ExistEmail;
 import com.crewcrew.domain.member.repository.MemberRepository;
+import com.crewcrew.global.common.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,9 @@ public class ExistEmailValidator implements ConstraintValidator<ExistEmail, Stri
 
     if (isValid) {
       context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate("EXIST_EMAIL").addConstraintViolation();
+      context
+          .buildConstraintViolationWithTemplate(ErrorCode.DUPLICATE_MEMBER_EMAIL.getMessage())
+          .addConstraintViolation();
     }
 
     return !isValid;

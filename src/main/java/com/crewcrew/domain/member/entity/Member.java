@@ -28,9 +28,6 @@ public class Member extends BaseEntity {
   @Schema(description = "사용자 비밀번호")
   private String password;
 
-  @Schema(description = "사용자 이름")
-  private String name;
-
   @Schema(description = "닉네임")
   private String nickName;
 

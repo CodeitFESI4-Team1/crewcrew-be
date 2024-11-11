@@ -5,14 +5,8 @@ import com.crewcrew.domain.member.entity.Member;
 
 public class MemberMapper {
 
-  public static Member toEmailMember(
-      String email, String name, String nickName, String encodedPassword) {
-    return Member.builder()
-        .email(email)
-        .name(name)
-        .nickName(nickName)
-        .password(encodedPassword)
-        .build();
+  public static Member toEmailMember(String email, String nickName, String encodedPassword) {
+    return Member.builder().email(email).nickName(nickName).password(encodedPassword).build();
   }
 
   public static MemberResponse.refreshTokenDto toRefreshToken(String refreshToken) {
