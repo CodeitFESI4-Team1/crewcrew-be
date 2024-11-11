@@ -109,7 +109,10 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(
-        List.of("http://localhost:3000", "https://crewcrew.vercel.app"));
+        List.of(
+            "http://localhost:3000",
+            "https://crewcrew.vercel.app",
+            "https://dev.dev-crewcrew.site"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setExposedHeaders(List.of("Authorization"));
