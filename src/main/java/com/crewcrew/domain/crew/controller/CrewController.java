@@ -49,7 +49,7 @@ public class CrewController {
   @Operation(summary = "크루 상세 조회", description = "특정 크루의 세부 정보를 조회합니다.")
   @GetMapping("/{crewId}")
   public ResponseEntity<CrewDetailResponse> getCrewDetail(
-      @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId) {
+      @Parameter(description = "크루 ID", required = true) @PathVariable("crewId") Long crewId) {
     CrewDetailResponse response = crewService.getCrewDetail(crewId);
     return ResponseEntity.ok(response);
   }
