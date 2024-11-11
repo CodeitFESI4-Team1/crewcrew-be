@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.like.entity.GatheringLike;
 
 @Repository
@@ -15,4 +16,8 @@ public interface GatheringLikeRepository extends JpaRepository<GatheringLike, Lo
   @Modifying
   @Query("DELETE FROM GatheringLike gl WHERE gl.gathering.crew.id = :crewId")
   void deleteByGatheringCrewId(@Param("crewId") Long crewId);
+
+  @Modifying
+  @Query("DELETE FROM GatheringParticipant gp WHERE gp.gathering = :gathering")
+  void deleteByGathering(@Param("gathering") Gathering gathering);
 }
