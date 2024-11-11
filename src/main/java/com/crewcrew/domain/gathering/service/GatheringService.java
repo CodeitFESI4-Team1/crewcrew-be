@@ -5,7 +5,10 @@ import static com.crewcrew.global.common.exception.ErrorCode.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +16,7 @@ import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.repository.CrewRepository;
 import com.crewcrew.domain.crew.repository.MemberCrewRepository;
 import com.crewcrew.domain.gathering.dto.request.GatheringCreateRequest;
-import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
-import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
-import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
-import com.crewcrew.domain.gathering.dto.response.ParticipantResponse;
+import com.crewcrew.domain.gathering.dto.response.*;
 import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.gathering.entity.GatheringParticipant;
 import com.crewcrew.domain.gathering.repository.GatheringParticipantRepository;
@@ -24,6 +24,7 @@ import com.crewcrew.domain.gathering.repository.GatheringRepository;
 import com.crewcrew.domain.like.repository.GatheringLikeRepository;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
+import com.crewcrew.global.common.dto.PagedResponse;
 import com.crewcrew.global.common.exception.ApiException;
 
 import lombok.RequiredArgsConstructor;
@@ -154,6 +155,37 @@ public class GatheringService {
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
     return gatheringRepository.findAllParticipatedGatherings(member.getId(), LocalDateTime.now());
+  }
+
+  public PagedResponse<GatheringReviewResponse> getReviewableGatherings(
+      String email, Pageable pageable) {
+    Member member =
+        memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
+
+    Slice<GatheringReviewResponse> gatherings =
+        gatheringRepository.findAllReviewableGatherings(
+            member.getId(), LocalDateTime.now(), pageable);
+
+    List<GatheringReviewResponse> limitedParticipants =
+        gatherings.getContent().stream()
+            .map(
+                gathering -> {
+                  List<GatheringParticipantResponse> limitedList =
+                      gathering.getParticipants().stream().limit(4).collect(Collectors.toList());
+                  return GatheringReviewResponse.builder()
+                      .id(gathering.getId())
+                      .title(gathering.getTitle())
+                      .dateTime(gathering.getDateTime())
+                      .location(gathering.getLocation())
+                      .currentCount(gathering.getCurrentCount())
+                      .totalCount(gathering.getTotalCount())
+                      .imageUrl(gathering.getImageUrl())
+                      .participants(limitedList)
+                      .build();
+                })
+            .collect(Collectors.toList());
+
+    return new PagedResponse<>(limitedParticipants, gatherings.hasNext());
   }
 
   private void validateGatheringJoin(Gathering gathering, Long gatheringId, Long memberId) {
