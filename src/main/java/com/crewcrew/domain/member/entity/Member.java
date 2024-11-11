@@ -31,9 +31,23 @@ public class Member extends BaseEntity {
   @Schema(description = "닉네임")
   private String nickName;
 
+  @Schema(description = "프로필 이미지")
   private String profileImageUrl;
 
   @Schema(description = "회원탈퇴 일자")
   @Column(name = "deleted_at")
   private LocalDateTime deletedAt;
+
+  public void update(
+      String email,
+      String password,
+      String nickName,
+      String profileImageUrl,
+      LocalDateTime deletedAt) {
+    this.email = email;
+    this.password = password;
+    this.nickName = nickName;
+    this.profileImageUrl = profileImageUrl;
+    this.deletedAt = deletedAt;
+  }
 }

@@ -13,11 +13,13 @@ public enum ErrorCode {
   // Common
   INVALID_INPUT_VALUE(BAD_REQUEST, "유효하지 않은 입력값입니다."),
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."),
-  USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "인증 정보가 잘못 되었습니다."),
+  USER_NOT_FOUND(UNAUTHORIZED, "인증 정보가 잘못 되었습니다."),
 
   // Member
   MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
   DUPLICATE_MEMBER_EMAIL(CONFLICT, "이미 존재하는 이메일입니다."),
+  INVALID_TOKEN(UNAUTHORIZED, "토큰이 올바르지 않습니다."),
+  EXPIRED_TOKEN(UNAUTHORIZED, "토큰이 만료되었습니다."),
 
   // Crew
   CREW_NOT_FOUND(NOT_FOUND, "크루 정보를 찾을 수 없습니다."),
