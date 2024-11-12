@@ -76,7 +76,8 @@ public class ReviewController {
   @Operation(summary = "내가 작성한 모든 리뷰 목록", description = "무한스크롤로 6개씩 불러옵니다.")
   @GetMapping("/memberReviews")
   public ResponseEntity<PagedResponse<ReviewResponse.MemberReviewListResponse>> memberReviews(
-      @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
+      @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
+          @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     PagedResponse<ReviewResponse.MemberReviewListResponse> response =
