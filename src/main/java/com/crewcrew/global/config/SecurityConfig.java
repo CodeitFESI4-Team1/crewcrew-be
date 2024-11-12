@@ -95,6 +95,8 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/auths/**")
                     .permitAll()
+                    .requestMatchers(HttpMethod.GET, "api/reivew/**")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))
