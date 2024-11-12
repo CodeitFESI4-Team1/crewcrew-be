@@ -1,5 +1,7 @@
 package com.crewcrew.domain.like.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +22,6 @@ public interface GatheringLikeRepository extends JpaRepository<GatheringLike, Lo
   @Modifying
   @Query("DELETE FROM GatheringParticipant gp WHERE gp.gathering = :gathering")
   void deleteByGathering(@Param("gathering") Gathering gathering);
+
+  Optional<GatheringLike> findByGatheringIdAndMemberId(Long gatheringId, Long memberId);
 }

@@ -60,7 +60,11 @@ public enum ErrorCode {
 
   // Review
   DUPLICATE_REVIEW(CONFLICT, "이미 리뷰를 작성하였습니다."),
-  UNAUTHORIZED_DELETE_REVIEW(UNAUTHORIZED, "리뷰를 삭제할 권한이 없습니다");
+  UNAUTHORIZED_DELETE_REVIEW(UNAUTHORIZED, "리뷰를 삭제할 권한이 없습니다"),
+
+  // Liked
+  DUPLICATE_LIKED(CONFLICT, "이미 찜하였습니다."),
+  UNAUTHORIZED_DELETE_LIKED(UNAUTHORIZED, "찜을 해제할 권한이 없습니다");
 
   private final HttpStatus httpStatus;
   private final String message;
