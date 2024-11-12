@@ -61,6 +61,6 @@ public class ReviewController {
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @Valid @RequestBody ReviewRequest.ReviewType reviewType) {
     reviewService.makeReview(gatheringId, userDetails, reviewType);
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok("리뷰가 생성 되었습니다.");
   }
 }

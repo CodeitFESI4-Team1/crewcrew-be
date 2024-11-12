@@ -69,12 +69,20 @@ public class ReviewService {
             .findById(gatheringId)
             .orElseThrow(() -> new ApiException(GATHERING_NOT_FOUND));
 
-    Review.builder()
-        .crew(gathering.getCrew())
-        .gathering(gathering)
-        .member(member)
-        .rate(reviewType.getRate())
-        .comment(reviewType.getComment())
-        .build();
+    boolean exist = reviewRepository.existsByMemberIdAndGatheringId(member.getId(), gatheringId);
+    if (exist) {
+      throw new ApiException(ErrorCode.DUPLICATE_REVIEW);
+    }
+
+    Review review =
+        Review.builder()
+            .crew(gathering.getCrew())
+            .gathering(gathering)
+            .member(member)
+            .rate(reviewType.getRate())
+            .comment(reviewType.getComment())
+            .build();
+
+    reviewRepository.save(review);
   }
 }

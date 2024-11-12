@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.crewcrew.domain.review.entity.Review;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewCustomRepository {}
+public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewCustomRepository {
+  boolean existsByMemberIdAndGatheringId(Long memberId, Long gatheringId);
+}
