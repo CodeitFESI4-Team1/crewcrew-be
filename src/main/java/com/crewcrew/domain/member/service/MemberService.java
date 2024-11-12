@@ -33,7 +33,7 @@ public class MemberService {
     Member newMember =
         MemberMapper.toEmailMember(
             requestDto.getEmail(),
-            requestDto.getNickName(),
+            requestDto.getNickname(),
             encoder.encode(requestDto.getPassword()));
     Member savedMember = memberRepository.save(newMember);
 
