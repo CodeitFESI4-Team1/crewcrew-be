@@ -64,11 +64,23 @@ public class ReviewController {
     return ResponseEntity.ok("리뷰가 생성 되었습니다.");
   }
 
+  @Operation(summary = "리뷰 삭제", description = "리뷰 삭제 API 입니다.")
   @DeleteMapping("{reviewId}")
   public ResponseEntity<?> deleteReview(
       @Parameter(description = "리뷰 ID", required = true) @PathVariable("reviewId") Long reviewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     reviewService.deleteReview(reviewId, userDetails);
     return ResponseEntity.ok("리뷰가 삭제 되었습니다.");
+  }
+
+  @Operation(summary = "내가 작성한 모든 리뷰 목록", description = "무한스크롤로 6개씩 불러옵니다.")
+  @GetMapping("/memberReviews")
+  public ResponseEntity<PagedResponse<ReviewResponse.MemberReviewListResponse>> memberReviews(
+      @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    PagedResponse<ReviewResponse.MemberReviewListResponse> response =
+        reviewService.getMemberReviews(pageable, userDetails);
+    return ResponseEntity.ok(response);
   }
 }

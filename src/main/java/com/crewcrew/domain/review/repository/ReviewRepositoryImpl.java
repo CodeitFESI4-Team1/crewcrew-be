@@ -67,6 +67,38 @@ public class ReviewRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
+  public Slice<ReviewResponse.MemberReviewListResponse> getMemberReviews(
+      Long memberId, Pageable pageable) {
+    List<ReviewResponse.MemberReviewListResponse> reviews =
+        queryFactory
+            .select(
+                Projections.constructor(
+                    ReviewResponse.MemberReviewListResponse.class,
+                    QReview.review.crew.id,
+                    QReview.review.crew.title,
+                    QReview.review.gathering.title,
+                    QReview.review.id,
+                    QReview.review.rate,
+                    QReview.review.comment,
+                    QReview.review.createdAt,
+                    QReview.review.gathering.location))
+            .from(QReview.review)
+            .where(QReview.review.member.id.eq(memberId))
+            .orderBy(QReview.review.createdAt.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
+
+    boolean hasNext = false;
+    if (reviews.size() > pageable.getPageSize()) {
+      reviews.remove(reviews.size() - 1);
+      hasNext = true;
+    }
+
+    return new SliceImpl<>(reviews, pageable, hasNext);
+  }
+
+  @Override
   public long getTotalRate(Crew crew) {
     return Optional.ofNullable(
             queryFactory

@@ -53,4 +53,18 @@ public class ReviewResponse {
     private ReviewRateInfo reviewRateInfo;
     private PagedResponse<ReviewListInfo> reviewList;
   }
+
+  @Getter
+  @Builder
+  @AllArgsConstructor
+  public static class MemberReviewListResponse {
+    private Long crewId;
+    private String crewName;
+    private String gatheringName;
+    private Long id;
+    private long rate;
+    private String comment;
+    private LocalDateTime createdAt;
+    private String gatheringLocation;
+  }
 }

@@ -16,4 +16,6 @@ public interface ReviewCustomRepository {
   long getReviewCount(Crew crew);
 
   Slice<ReviewResponse.ReviewListInfo> findReviews(Long crewId, Pageable pageable);
+
+  Slice<ReviewResponse.MemberReviewListResponse> getMemberReviews(Long MemberId, Pageable pageable);
 }

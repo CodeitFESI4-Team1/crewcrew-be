@@ -95,4 +95,12 @@ public class ReviewService {
 
     reviewRepository.deleteById(reviewId);
   }
+
+  public PagedResponse<ReviewResponse.MemberReviewListResponse> getMemberReviews(
+      Pageable pageable, CustomUserDetails userDetails) {
+    Slice<ReviewResponse.MemberReviewListResponse> slice =
+        reviewRepository.getMemberReviews(userDetails.getUserId(), pageable);
+
+    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+  }
 }
