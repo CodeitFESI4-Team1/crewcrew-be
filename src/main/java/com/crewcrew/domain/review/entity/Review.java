@@ -13,6 +13,13 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+    name = "review",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "member_gathering_unique",
+          columnNames = {"member_id", "gathering_id"})
+    })
 @Entity
 public class Review extends BaseEntity {
   @Id
