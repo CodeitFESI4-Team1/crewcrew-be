@@ -1,11 +1,16 @@
 package com.crewcrew.domain.like.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.crewcrew.domain.like.dto.GatheringLikeResponse;
 import com.crewcrew.domain.like.service.GatheringLikeService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
+import com.crewcrew.global.common.dto.PagedResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,5 +48,17 @@ public class GatheringLikeController {
     gatheringLikeService.DeleteGatheringLike(gatheringId, userDetails);
 
     return ResponseEntity.ok("찜 해제 되었습니다.");
+  }
+
+  @Operation(summary = "내가 찜한 목록 조회", description = "무한스크롤로 6개씩 불러옵니다.")
+  @GetMapping("/memberLikes")
+  public ResponseEntity<PagedResponse<GatheringLikeResponse.GatheringLikeList>> memberLikes(
+      @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
+          @PageableDefault(size = 6, sort = "dateTime", direction = Sort.Direction.ASC)
+          Pageable pageable,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    PagedResponse<GatheringLikeResponse.GatheringLikeList> response =
+        gatheringLikeService.getMemberLikes(pageable, userDetails);
+    return ResponseEntity.ok(response);
   }
 }

@@ -2,16 +2,20 @@ package com.crewcrew.domain.like.service;
 
 import static com.crewcrew.global.common.exception.ErrorCode.GATHERING_NOT_FOUND;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.gathering.repository.GatheringRepository;
+import com.crewcrew.domain.like.dto.GatheringLikeResponse;
 import com.crewcrew.domain.like.entity.GatheringLike;
 import com.crewcrew.domain.like.repository.GatheringLikeRepository;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
+import com.crewcrew.global.common.dto.PagedResponse;
 import com.crewcrew.global.common.exception.ApiException;
 import com.crewcrew.global.common.exception.ErrorCode;
 
@@ -67,5 +71,13 @@ public class GatheringLikeService {
             .orElseThrow(() -> new ApiException(ErrorCode.UNAUTHORIZED_DELETE_LIKED));
 
     gatheringLikeRepository.deleteById(gatheringLike.getId());
+  }
+
+  public PagedResponse<GatheringLikeResponse.GatheringLikeList> getMemberLikes(
+      Pageable pageable, CustomUserDetails userDetails) {
+    Slice<GatheringLikeResponse.GatheringLikeList> slice =
+        gatheringLikeRepository.getMemberLikes(userDetails.getUserId(), pageable);
+
+    return new PagedResponse<>(slice.getContent(), slice.hasNext());
   }
 }

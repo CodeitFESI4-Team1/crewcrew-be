@@ -12,7 +12,8 @@ import com.crewcrew.domain.gathering.entity.Gathering;
 import com.crewcrew.domain.like.entity.GatheringLike;
 
 @Repository
-public interface GatheringLikeRepository extends JpaRepository<GatheringLike, Long> {
+public interface GatheringLikeRepository
+    extends JpaRepository<GatheringLike, Long>, GatheringLikeCustomRepository {
   boolean existsByGatheringIdAndMemberId(Long gatheringId, Long memberId);
 
   @Modifying
