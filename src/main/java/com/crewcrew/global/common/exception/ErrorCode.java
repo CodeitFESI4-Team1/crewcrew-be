@@ -59,7 +59,8 @@ public enum ErrorCode {
   INVALID_IMAGE_FILENAME(BAD_REQUEST, "잘못된 파일명입니다."),
 
   // Review
-  DUPLICATE_REVIEW(CONFLICT, "이미 리뷰를 작성하였습니다.");
+  DUPLICATE_REVIEW(CONFLICT, "이미 리뷰를 작성하였습니다."),
+  UNAUTHORIZED_DELETE_REVIEW(UNAUTHORIZED, "리뷰를 삭제할 권한이 없습니다");
 
   private final HttpStatus httpStatus;
   private final String message;

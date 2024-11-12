@@ -8,4 +8,6 @@ import com.crewcrew.domain.review.entity.Review;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewCustomRepository {
   boolean existsByMemberIdAndGatheringId(Long memberId, Long gatheringId);
+
+  boolean existsByIdAndMemberId(Long reviewId, Long memberId);
 }

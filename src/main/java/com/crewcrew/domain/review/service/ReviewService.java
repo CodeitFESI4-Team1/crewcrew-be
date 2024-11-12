@@ -85,4 +85,14 @@ public class ReviewService {
 
     reviewRepository.save(review);
   }
+
+  @Transactional
+  public void deleteReview(Long reviewId, CustomUserDetails userDetails) {
+    boolean exist = reviewRepository.existsByIdAndMemberId(reviewId, userDetails.getUserId());
+    if (!exist) {
+      throw new ApiException(ErrorCode.UNAUTHORIZED_DELETE_REVIEW);
+    }
+
+    reviewRepository.deleteById(reviewId);
+  }
 }

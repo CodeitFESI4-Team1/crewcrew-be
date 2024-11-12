@@ -63,4 +63,12 @@ public class ReviewController {
     reviewService.makeReview(gatheringId, userDetails, reviewType);
     return ResponseEntity.ok("리뷰가 생성 되었습니다.");
   }
+
+  @DeleteMapping("{reviewId}")
+  public ResponseEntity<?> deleteReview(
+      @Parameter(description = "리뷰 ID", required = true) @PathVariable("reviewId") Long reviewId,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    reviewService.deleteReview(reviewId, userDetails);
+    return ResponseEntity.ok("리뷰가 삭제 되었습니다.");
+  }
 }
