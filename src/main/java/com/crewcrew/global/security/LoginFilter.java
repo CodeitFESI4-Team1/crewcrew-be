@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.service.MemberMapper;
+import com.crewcrew.global.common.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
@@ -58,7 +59,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
           request,
           response,
           HttpServletResponse.SC_BAD_REQUEST,
-          ResponseEntity.badRequest().body(null));
+          ResponseEntity.status(400).body(ErrorCode.INVALID_INPUT_VALUE.getMessage()));
       return null;
     }
 
@@ -103,7 +104,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         request,
         response,
         HttpServletResponse.SC_UNAUTHORIZED,
-        ResponseEntity.badRequest().body(null));
+        ResponseEntity.status(401).body(ErrorCode.MEMBER_NOT_FOUND.getMessage()));
   }
 
   private void writeOutput(
