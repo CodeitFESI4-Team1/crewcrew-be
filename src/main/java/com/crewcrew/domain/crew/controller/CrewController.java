@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
 import com.crewcrew.domain.crew.dto.request.CrewSearchCondition;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
+import com.crewcrew.domain.crew.dto.response.CreateCrewResponse;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.dto.response.CrewListResponse;
 import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
@@ -38,12 +39,11 @@ public class CrewController {
 
   @Operation(summary = "크루 생성", description = "새로운 크루를 생성합니다.")
   @PostMapping
-  public ResponseEntity<String> createCrew(
+  public ResponseEntity<CreateCrewResponse> createCrew(
       @Parameter(description = "크루 생성 요청 DTO", required = true) @Valid @RequestBody
           CrewCreateRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    crewService.createCrew(request, getCurrentUsername(userDetails));
-    return ResponseEntity.ok("크루가 생성 되었습니다.");
+    return ResponseEntity.ok(crewService.createCrew(request, getCurrentUsername(userDetails)));
   }
 
   @Operation(summary = "크루 상세 조회", description = "특정 크루의 세부 정보를 조회합니다.")
