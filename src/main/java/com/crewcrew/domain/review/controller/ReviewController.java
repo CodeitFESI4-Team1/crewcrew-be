@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/reivew")
+@RequestMapping("/api/review")
 @Tag(name = "리뷰 기능 API")
 public class ReviewController {
   private final ReviewService reviewService;
