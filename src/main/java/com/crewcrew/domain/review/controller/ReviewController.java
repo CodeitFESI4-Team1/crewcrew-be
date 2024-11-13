@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/review")
 @Tag(name = "리뷰 기능 API")
 public class ReviewController {
@@ -60,7 +62,7 @@ public class ReviewController {
       @Parameter(description = "모임 ID", required = true) @PathVariable("gatheringId")
           Long gatheringId,
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @Valid @RequestBody ReviewRequest.ReviewType reviewType) {
+      @RequestBody @Valid ReviewRequest.ReviewType reviewType) {
     reviewService.makeReview(gatheringId, userDetails, reviewType);
     return ResponseEntity.ok("리뷰가 생성 되었습니다.");
   }
