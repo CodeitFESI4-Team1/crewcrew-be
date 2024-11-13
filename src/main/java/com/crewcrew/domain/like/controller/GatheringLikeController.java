@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.like.dto.GatheringLikeResponse;
 import com.crewcrew.domain.like.service.GatheringLikeService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
-import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,14 +50,14 @@ public class GatheringLikeController {
     return ResponseEntity.ok("찜 해제 되었습니다.");
   }
 
-  @Operation(summary = "내가 찜한 목록 조회", description = "무한스크롤로 6개씩 불러옵니다.")
+  @Operation(summary = "내가 찜한 목록 조회", description = "페이지네이션으로 6개씩 불러옵니다.")
   @GetMapping("/memberLikes")
-  public ResponseEntity<PagedResponse<GatheringLikeResponse.GatheringLikeList>> memberLikes(
+  public ResponseEntity<PaginationResponse<GatheringLikeResponse.GatheringLikeList>> memberLikes(
       @Parameter(description = "페이지 정보 (기본값: 사이즈 6)")
           @PageableDefault(size = 6, sort = "dateTime", direction = Sort.Direction.ASC)
           Pageable pageable,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    PagedResponse<GatheringLikeResponse.GatheringLikeList> response =
+    PaginationResponse<GatheringLikeResponse.GatheringLikeList> response =
         gatheringLikeService.getMemberLikes(pageable, userDetails);
     return ResponseEntity.ok(response);
   }

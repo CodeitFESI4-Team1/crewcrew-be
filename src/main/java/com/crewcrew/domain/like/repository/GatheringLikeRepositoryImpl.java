@@ -2,13 +2,12 @@ package com.crewcrew.domain.like.repository;
 
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 
 import com.crewcrew.domain.like.dto.GatheringLikeResponse;
 import com.crewcrew.domain.like.entity.QGatheringLike;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,9 @@ public class GatheringLikeRepositoryImpl implements GatheringLikeCustomRepositor
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Slice<GatheringLikeResponse.GatheringLikeList> getMemberLikes(
+  public Page<GatheringLikeResponse.GatheringLikeList> getMemberLikes(
       Long userId, Pageable pageable) {
-    List<GatheringLikeResponse.GatheringLikeList> gatheringLikes =
+    JPAQuery<GatheringLikeResponse.GatheringLikeList> query =
         queryFactory
             .select(
                 Projections.fields(
@@ -37,17 +36,20 @@ public class GatheringLikeRepositoryImpl implements GatheringLikeCustomRepositor
             .from(QGatheringLike.gatheringLike)
             .where(QGatheringLike.gatheringLike.member.id.eq(userId))
             .groupBy(QGatheringLike.gatheringLike.gathering.id)
-            .orderBy(QGatheringLike.gatheringLike.gathering.dateTime.asc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
-            .fetch();
+            .orderBy(QGatheringLike.gatheringLike.gathering.dateTime.asc());
 
-    boolean hasNext = false;
-    if (gatheringLikes.size() > pageable.getPageSize()) {
-      gatheringLikes.remove(gatheringLikes.size() - 1);
-      hasNext = true;
-    }
+    JPAQuery<Long> countQuery =
+        queryFactory
+            .select(QGatheringLike.gatheringLike.count())
+            .from(QGatheringLike.gatheringLike)
+            .where(QGatheringLike.gatheringLike.member.id.eq(userId))
+            .groupBy(QGatheringLike.gatheringLike.gathering.id);
 
-    return new SliceImpl<>(gatheringLikes, pageable, hasNext);
+    List<GatheringLikeResponse.GatheringLikeList> content =
+        query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+
+    long total = countQuery.fetchOne();
+
+    return new PageImpl<>(content, pageable, total);
   }
 }
