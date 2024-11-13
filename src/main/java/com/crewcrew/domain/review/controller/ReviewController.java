@@ -14,6 +14,7 @@ import com.crewcrew.domain.review.dto.ReviewRequest;
 import com.crewcrew.domain.review.dto.ReviewResponse;
 import com.crewcrew.domain.review.service.ReviewService;
 import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +42,7 @@ public class ReviewController {
     ReviewResponse.ReviewRateInfo rateInfo = reviewService.getReviewRateInfo(crewId);
 
     // 페이징된 리뷰 리스트 가져오기
-    PagedResponse<ReviewResponse.ReviewListInfo> reviewList =
+    PaginationResponse<ReviewResponse.ReviewListInfo> reviewList =
         reviewService.getPagedReviews(crewId, pageable);
 
     ReviewResponse.ReviewSummaryAndListResponse response =

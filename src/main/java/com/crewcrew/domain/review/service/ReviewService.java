@@ -5,6 +5,7 @@ import static com.crewcrew.global.common.exception.ErrorCode.GATHERING_NOT_FOUND
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.crewcrew.domain.review.dto.ReviewResponse;
 import com.crewcrew.domain.review.entity.Review;
 import com.crewcrew.domain.review.repository.ReviewRepository;
 import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 import com.crewcrew.global.common.exception.ApiException;
 import com.crewcrew.global.common.exception.ErrorCode;
 
@@ -50,10 +52,15 @@ public class ReviewService {
         .build();
   }
 
-  public PagedResponse<ReviewResponse.ReviewListInfo> getPagedReviews(
+  public PaginationResponse<ReviewResponse.ReviewListInfo> getPagedReviews(
       Long crewId, Pageable pageable) {
-    Slice<ReviewResponse.ReviewListInfo> slice = reviewRepository.findReviews(crewId, pageable);
-    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+    Page<ReviewResponse.ReviewListInfo> page = reviewRepository.findReviews(crewId, pageable);
+    return new PaginationResponse<>(
+        page.getContent(),
+        page.getNumber(),
+        page.getSize(),
+        page.getTotalElements(),
+        page.getTotalPages());
   }
 
   @Transactional

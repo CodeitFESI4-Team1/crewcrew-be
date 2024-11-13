@@ -2,6 +2,7 @@ package com.crewcrew.domain.review.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -15,7 +16,7 @@ public interface ReviewCustomRepository {
 
   long getReviewCount(Crew crew);
 
-  Slice<ReviewResponse.ReviewListInfo> findReviews(Long crewId, Pageable pageable);
+  Page<ReviewResponse.ReviewListInfo> findReviews(Long crewId, Pageable pageable);
 
   Slice<ReviewResponse.MemberReviewListResponse> getMemberReviews(Long MemberId, Pageable pageable);
 }
