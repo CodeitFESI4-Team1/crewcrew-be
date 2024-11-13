@@ -3,7 +3,7 @@ package com.crewcrew.domain.review.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +51,7 @@ public class ReviewResponse {
   @Builder
   public static class ReviewSummaryAndListResponse {
     private ReviewRateInfo reviewRateInfo;
-    private PagedResponse<ReviewListInfo> reviewList;
+    private PaginationResponse<ReviewListInfo> reviewList;
   }
 
   @Getter

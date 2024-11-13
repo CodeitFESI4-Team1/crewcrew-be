@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
@@ -14,6 +15,7 @@ import com.crewcrew.domain.review.dto.ReviewRequest;
 import com.crewcrew.domain.review.dto.ReviewResponse;
 import com.crewcrew.domain.review.service.ReviewService;
 import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/review")
 @Tag(name = "리뷰 기능 API")
 public class ReviewController {
@@ -41,7 +44,7 @@ public class ReviewController {
     ReviewResponse.ReviewRateInfo rateInfo = reviewService.getReviewRateInfo(crewId);
 
     // 페이징된 리뷰 리스트 가져오기
-    PagedResponse<ReviewResponse.ReviewListInfo> reviewList =
+    PaginationResponse<ReviewResponse.ReviewListInfo> reviewList =
         reviewService.getPagedReviews(crewId, pageable);
 
     ReviewResponse.ReviewSummaryAndListResponse response =
@@ -59,7 +62,7 @@ public class ReviewController {
       @Parameter(description = "모임 ID", required = true) @PathVariable("gatheringId")
           Long gatheringId,
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @Valid @RequestBody ReviewRequest.ReviewType reviewType) {
+      @RequestBody @Valid ReviewRequest.ReviewType reviewType) {
     reviewService.makeReview(gatheringId, userDetails, reviewType);
     return ResponseEntity.ok("리뷰가 생성 되었습니다.");
   }

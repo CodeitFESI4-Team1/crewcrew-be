@@ -3,15 +3,14 @@ package com.crewcrew.domain.review.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 
 import com.crewcrew.domain.crew.entity.Crew;
 import com.crewcrew.domain.crew.entity.QCrew;
 import com.crewcrew.domain.review.dto.ReviewResponse;
 import com.crewcrew.domain.review.entity.QReview;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -34,8 +33,8 @@ public class ReviewRepositoryImpl implements ReviewCustomRepository {
   }
 
   @Override
-  public Slice<ReviewResponse.ReviewListInfo> findReviews(Long crewId, Pageable pageable) {
-    List<ReviewResponse.ReviewListInfo> crews =
+  public Page<ReviewResponse.ReviewListInfo> findReviews(Long crewId, Pageable pageable) {
+    JPAQuery<ReviewResponse.ReviewListInfo> query =
         queryFactory
             .select(
                 Projections.constructor(
@@ -52,18 +51,20 @@ public class ReviewRepositoryImpl implements ReviewCustomRepository {
                         QReview.review.member.profileImageUrl)))
             .from(QReview.review)
             .where(QReview.review.crew.id.eq(crewId))
-            .orderBy(QReview.review.createdAt.desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
-            .fetch();
+            .orderBy(QReview.review.createdAt.desc());
 
-    boolean hasNext = false;
-    if (crews.size() > pageable.getPageSize()) {
-      crews.remove(crews.size() - 1);
-      hasNext = true;
-    }
+    JPAQuery<Long> countQuery =
+        queryFactory
+            .select(QReview.review.count())
+            .from(QReview.review)
+            .where(QReview.review.crew.id.eq(crewId));
 
-    return new SliceImpl<>(crews, pageable, hasNext);
+    List<ReviewResponse.ReviewListInfo> content =
+        query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+
+    long total = countQuery.fetchOne();
+
+    return new PageImpl<>(content, pageable, total);
   }
 
   @Override
