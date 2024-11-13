@@ -11,6 +11,7 @@ import lombok.Getter;
 @Builder
 public class GatheringDetailResponse {
   private Long id;
+  private Long crewId;
   private String title;
   private String introduce;
   private String dateTime;
@@ -28,6 +29,7 @@ public class GatheringDetailResponse {
       Gathering gathering, List<ParticipantResponse> participants) {
     return GatheringDetailResponse.builder()
         .id(gathering.getId())
+        .crewId(gathering.getCrew().getId())
         .title(gathering.getTitle())
         .introduce(gathering.getIntroduce())
         .dateTime(gathering.getDateTime().toString())
@@ -47,6 +49,7 @@ public class GatheringDetailResponse {
       boolean isParticipant) {
     return GatheringDetailResponse.builder()
         .id(gathering.getId())
+        .crewId(gathering.getCrew().getId())
         .title(gathering.getTitle())
         .introduce(gathering.getIntroduce())
         .dateTime(gathering.getDateTime().toString())
