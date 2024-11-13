@@ -63,10 +63,10 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "FROM Gathering g "
           + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp WHERE gp.gathering = g "
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = true) "
-          + "AND g.dateTime > :now "
+          + "AND g.dateTime > :startDateTime "
           + "ORDER BY g.dateTime DESC")
   List<MyGatheringListResponse> findAllByMemberAndIsCaptain(
-      @Param("memberId") Long memberId, @Param("now") LocalDateTime now);
+      @Param("memberId") Long memberId, @Param("startDateTime") LocalDateTime startDateTime);
 
   @Query(
       "SELECT new com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse("
@@ -79,10 +79,10 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "FROM Gathering g "
           + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp WHERE gp.gathering = g "
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = false) "
-          + "AND g.dateTime > :now "
+          + "AND g.dateTime > :startDateTime "
           + "ORDER BY g.dateTime DESC")
   List<MyGatheringListResponse> findAllParticipatedGatherings(
-      @Param("memberId") Long memberId, @Param("now") LocalDateTime now);
+      @Param("memberId") Long memberId, @Param("startDateTime") LocalDateTime startDateTime);
 
   @Modifying
   @Query("DELETE FROM Gathering g WHERE g.crew.id = :crewId")

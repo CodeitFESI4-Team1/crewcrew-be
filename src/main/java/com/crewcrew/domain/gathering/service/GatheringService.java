@@ -143,18 +143,20 @@ public class GatheringService {
     return gatheringRepository.findAllByCrewIdWithLikeInfo(crewId, member.getId(), now);
   }
 
-  public List<MyGatheringListResponse> getMyHostedGatherings(String email) {
+  public List<MyGatheringListResponse> getMyHostedGatherings(
+      String email, LocalDateTime startDateTime) {
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
-    return gatheringRepository.findAllByMemberAndIsCaptain(member.getId(), LocalDateTime.now());
+    return gatheringRepository.findAllByMemberAndIsCaptain(member.getId(), startDateTime);
   }
 
-  public List<MyGatheringListResponse> getMyParticipatedGatherings(String email) {
+  public List<MyGatheringListResponse> getMyParticipatedGatherings(
+      String email, LocalDateTime startDateTime) {
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
-    return gatheringRepository.findAllParticipatedGatherings(member.getId(), LocalDateTime.now());
+    return gatheringRepository.findAllParticipatedGatherings(member.getId(), startDateTime);
   }
 
   public PagedResponse<GatheringReviewResponse> getReviewableGatherings(

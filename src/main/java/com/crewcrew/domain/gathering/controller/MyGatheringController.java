@@ -2,15 +2,19 @@ package com.crewcrew.domain.gathering.controller;
 
 import static com.crewcrew.global.common.exception.SecurityUtil.getCurrentUsername;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.crewcrew.domain.gathering.dto.response.GatheringReviewResponse;
@@ -38,15 +42,22 @@ public class MyGatheringController {
       description =
           """
                             로그인한 사용자가 모임장인 약속 목록을 조회합니다.
-                            - 조건: 현재 시간 이후의 약속만 조회됩니다.
+                            - 조건: 지정된 날짜 이후의 약속만 조회됩니다.
                             - 정렬: 날짜 기준 내림차순 (최신순)
                             """)
   @GetMapping("/hosted")
   public ResponseEntity<List<MyGatheringListResponse>> getMyHostedGatherings(
-      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "조회 시작 날짜 (yyyy-MM-dd)")
+          @RequestParam(required = false)
+          @DateTimeFormat(pattern = "yyyy-MM-dd")
+          LocalDate startDate) {
+
+    LocalDateTime startDateTime =
+        startDate != null ? startDate.atStartOfDay() : LocalDateTime.now();
 
     return ResponseEntity.ok(
-        gatheringService.getMyHostedGatherings(getCurrentUsername(userDetails)));
+        gatheringService.getMyHostedGatherings(getCurrentUsername(userDetails), startDateTime));
   }
 
   @Operation(
@@ -54,15 +65,23 @@ public class MyGatheringController {
       description =
           """
                             로그인한 사용자가 참여자로 있는 약속 목록을 조회합니다. (모임장인 약속은 제외)
-                            - 조건: 현재 시간 이후의 약속만 조회됩니다.
+                            - 조건: 지정된 날짜 이후의 약속만 조회됩니다.
                             - 정렬: 날짜 기준 내림차순 (최신순)
                             """)
   @GetMapping("/joined")
   public ResponseEntity<List<MyGatheringListResponse>> getMyParticipatedGatherings(
-      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "조회 시작 날짜 (yyyy-MM-dd)")
+          @RequestParam(required = false)
+          @DateTimeFormat(pattern = "yyyy-MM-dd")
+          LocalDate startDate) {
+
+    LocalDateTime startDateTime =
+        startDate != null ? startDate.atStartOfDay() : LocalDateTime.now();
 
     return ResponseEntity.ok(
-        gatheringService.getMyParticipatedGatherings(getCurrentUsername(userDetails)));
+        gatheringService.getMyParticipatedGatherings(
+            getCurrentUsername(userDetails), startDateTime));
   }
 
   @Operation(
