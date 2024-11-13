@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.crewcrew.domain.crew.dto.request.CrewCreateRequest;
 import com.crewcrew.domain.crew.dto.request.CrewSearchCondition;
 import com.crewcrew.domain.crew.dto.request.CrewUpdateRequest;
+import com.crewcrew.domain.crew.dto.response.CreateCrewResponse;
 import com.crewcrew.domain.crew.dto.response.CrewDetailResponse;
 import com.crewcrew.domain.crew.dto.response.CrewListResponse;
 import com.crewcrew.domain.crew.dto.response.JoinedCrewResponse;
@@ -46,15 +47,17 @@ public class CrewService {
   private final GatheringParticipantRepository gatheringParticipantRepository;
 
   @Transactional
-  public void createCrew(CrewCreateRequest request, String email) {
+  public CreateCrewResponse createCrew(CrewCreateRequest request, String email) {
     validateCrewTitle(request.getTitle());
     Member member = findMember(email);
     Crew crew = request.toEntity();
-    crewRepository.save(crew);
+    Crew savedCrew = crewRepository.save(crew);
 
-    MemberCrew memberCrew = MemberCrew.builder().member(member).crew(crew).isCaptain(true).build();
+    MemberCrew memberCrew =
+        MemberCrew.builder().member(member).crew(savedCrew).isCaptain(true).build();
 
     memberCrewRepository.save(memberCrew);
+    return CreateCrewResponse.of(savedCrew.getId());
   }
 
   public CrewDetailResponse getCrewDetail(Long crewId) {
