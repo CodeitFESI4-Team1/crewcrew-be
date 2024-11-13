@@ -81,7 +81,7 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = false) "
           + "AND g.dateTime > :startDateTime "
           + "ORDER BY g.dateTime DESC")
-  List<MyGatheringListResponse> findAllParticipatedGatherings(
+  List<MyGatheringListResponse> findAllParticipatedGathering(
       @Param("memberId") Long memberId, @Param("startDateTime") LocalDateTime startDateTime);
 
   @Modifying

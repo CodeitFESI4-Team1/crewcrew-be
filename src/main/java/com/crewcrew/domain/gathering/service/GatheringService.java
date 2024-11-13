@@ -156,7 +156,7 @@ public class GatheringService {
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
-    return gatheringRepository.findAllParticipatedGatherings(member.getId(), startDateTime);
+    return gatheringRepository.findAllParticipatedGathering(member.getId(), startDateTime);
   }
 
   public PagedResponse<GatheringReviewResponse> getReviewableGatherings(
