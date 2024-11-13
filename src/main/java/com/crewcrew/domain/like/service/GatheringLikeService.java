@@ -2,8 +2,8 @@ package com.crewcrew.domain.like.service;
 
 import static com.crewcrew.global.common.exception.ErrorCode.GATHERING_NOT_FOUND;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ import com.crewcrew.domain.like.repository.GatheringLikeRepository;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.member.entity.Member;
 import com.crewcrew.domain.member.repository.MemberRepository;
-import com.crewcrew.global.common.dto.PagedResponse;
+import com.crewcrew.global.common.dto.PaginationResponse;
 import com.crewcrew.global.common.exception.ApiException;
 import com.crewcrew.global.common.exception.ErrorCode;
 
@@ -73,11 +73,16 @@ public class GatheringLikeService {
     gatheringLikeRepository.deleteById(gatheringLike.getId());
   }
 
-  public PagedResponse<GatheringLikeResponse.GatheringLikeList> getMemberLikes(
+  public PaginationResponse<GatheringLikeResponse.GatheringLikeList> getMemberLikes(
       Pageable pageable, CustomUserDetails userDetails) {
-    Slice<GatheringLikeResponse.GatheringLikeList> slice =
+    Page<GatheringLikeResponse.GatheringLikeList> page =
         gatheringLikeRepository.getMemberLikes(userDetails.getUserId(), pageable);
 
-    return new PagedResponse<>(slice.getContent(), slice.hasNext());
+    return new PaginationResponse<>(
+        page.getContent(),
+        page.getNumber(),
+        page.getSize(),
+        page.getTotalElements(),
+        page.getTotalPages());
   }
 }
