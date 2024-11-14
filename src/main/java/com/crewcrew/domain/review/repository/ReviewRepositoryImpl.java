@@ -53,16 +53,17 @@ public class ReviewRepositoryImpl implements ReviewCustomRepository {
             .where(QReview.review.crew.id.eq(crewId))
             .orderBy(QReview.review.createdAt.desc());
 
-    JPAQuery<Long> countQuery =
-        queryFactory
-            .select(QReview.review.count())
-            .from(QReview.review)
-            .where(QReview.review.crew.id.eq(crewId));
-
     List<ReviewResponse.ReviewListInfo> content =
         query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
-    long total = countQuery.fetchOne();
+    Long count =
+        queryFactory
+            .select(QReview.review.count())
+            .from(QReview.review)
+            .where(QReview.review.crew.id.eq(crewId))
+            .fetchOne();
+
+    long total = count != null ? count : 0L;
 
     return new PageImpl<>(content, pageable, total);
   }

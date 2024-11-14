@@ -38,17 +38,17 @@ public class GatheringLikeRepositoryImpl implements GatheringLikeCustomRepositor
             .groupBy(QGatheringLike.gatheringLike.gathering.id)
             .orderBy(QGatheringLike.gatheringLike.gathering.dateTime.asc());
 
-    JPAQuery<Long> countQuery =
+    List<GatheringLikeResponse.GatheringLikeList> content =
+        query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+
+    Long count =
         queryFactory
             .select(QGatheringLike.gatheringLike.count())
             .from(QGatheringLike.gatheringLike)
             .where(QGatheringLike.gatheringLike.member.id.eq(userId))
-            .groupBy(QGatheringLike.gatheringLike.gathering.id);
+            .fetchOne();
 
-    List<GatheringLikeResponse.GatheringLikeList> content =
-        query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
-
-    long total = countQuery.fetchOne();
+    long total = count != null ? count : 0L;
 
     return new PageImpl<>(content, pageable, total);
   }
