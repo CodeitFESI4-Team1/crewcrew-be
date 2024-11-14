@@ -17,6 +17,9 @@ public class CrewUpdateRequest {
   @Size(max = 20, message = "제목은 20자를 초과할 수 없습니다")
   private String title;
 
+  @Size(max = 100, message = "크루 소개는 100자 이하여야 합니다.")
+  private String introduce;
+
   @NotNull(message = "메인 카테고리는 필수입니다")
   private String mainCategory;
 

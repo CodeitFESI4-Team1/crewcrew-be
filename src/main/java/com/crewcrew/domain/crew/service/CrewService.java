@@ -77,6 +77,7 @@ public class CrewService {
 
     crew.update(
         request.getTitle(),
+        request.getIntroduce(),
         MainCategory.fromLabel(request.getMainCategory()),
         SubCategory.fromLabel(request.getSubCategory()),
         request.getMainLocation(),

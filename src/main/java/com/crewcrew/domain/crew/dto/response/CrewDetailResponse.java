@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 public class CrewDetailResponse {
   private Long id;
   private String title;
+  private String introduce;
+  private String mainCategory;
+  private String subCategory;
   private String mainLocation;
   private String subLocation;
   private Integer participantCount;

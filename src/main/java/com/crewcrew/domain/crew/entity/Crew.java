@@ -23,6 +23,9 @@ public class Crew extends BaseEntity {
   @Column(length = 20, nullable = false, unique = true)
   private String title;
 
+  @Column(length = 100)
+  private String introduce;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private MainCategory mainCategory;
@@ -51,6 +54,7 @@ public class Crew extends BaseEntity {
 
   public void update(
       String title,
+      String introduce,
       MainCategory mainCategory,
       SubCategory subCategory,
       String mainLocation,
@@ -58,6 +62,7 @@ public class Crew extends BaseEntity {
       Integer totalCount,
       String imageUrl) {
     this.title = title;
+    this.introduce = introduce;
     this.mainCategory = mainCategory;
     this.subCategory = subCategory;
     this.mainLocation = mainLocation;
