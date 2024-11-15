@@ -61,6 +61,7 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                     CrewDetailResponse.CrewMemberResponse.class,
                     QMember.member.id,
                     QMember.member.nickName,
+                    QMember.member.email,
                     QMember.member.profileImageUrl,
                     QMemberCrew.memberCrew.isCaptain))
             .from(QMemberCrew.memberCrew)
