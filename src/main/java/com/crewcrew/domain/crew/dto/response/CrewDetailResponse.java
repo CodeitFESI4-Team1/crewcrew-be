@@ -34,6 +34,7 @@ public class CrewDetailResponse {
   public static class CrewMemberResponse {
     private Long id;
     private String nickname;
+    private String email;
     private String profileImageUrl;
     private boolean isCaptain;
   }
