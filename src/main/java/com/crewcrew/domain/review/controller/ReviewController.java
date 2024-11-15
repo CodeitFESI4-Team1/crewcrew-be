@@ -14,6 +14,7 @@ import com.crewcrew.domain.member.dto.CustomUserDetails;
 import com.crewcrew.domain.review.dto.ReviewRequest;
 import com.crewcrew.domain.review.dto.ReviewResponse;
 import com.crewcrew.domain.review.service.ReviewService;
+import com.crewcrew.global.common.dto.ApiResponse;
 import com.crewcrew.global.common.dto.PagedResponse;
 import com.crewcrew.global.common.dto.PaginationResponse;
 
@@ -58,22 +59,22 @@ public class ReviewController {
 
   @Operation(summary = "리뷰 작성", description = "리뷰 작성 API 입니다. 유저 1명당 모임 1개에 최대 1명 작성할 수 있습니다.")
   @PostMapping("{gatheringId}")
-  public ResponseEntity<?> makeReview(
+  public ResponseEntity<ApiResponse> makeReview(
       @Parameter(description = "모임 ID", required = true) @PathVariable("gatheringId")
           Long gatheringId,
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestBody @Valid ReviewRequest.ReviewType reviewType) {
     reviewService.makeReview(gatheringId, userDetails, reviewType);
-    return ResponseEntity.ok("리뷰가 생성 되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("리뷰가 생성 되었습니다."));
   }
 
   @Operation(summary = "리뷰 삭제", description = "리뷰 삭제 API 입니다.")
   @DeleteMapping("{reviewId}")
-  public ResponseEntity<?> deleteReview(
+  public ResponseEntity<ApiResponse> deleteReview(
       @Parameter(description = "리뷰 ID", required = true) @PathVariable("reviewId") Long reviewId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     reviewService.deleteReview(reviewId, userDetails);
-    return ResponseEntity.ok("리뷰가 삭제 되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("리뷰가 삭제 되었습니다."));
   }
 
   @Operation(summary = "내가 작성한 모든 리뷰 목록", description = "무한스크롤로 6개씩 불러옵니다.")

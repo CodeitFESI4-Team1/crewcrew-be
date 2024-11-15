@@ -16,6 +16,7 @@ import com.crewcrew.domain.gathering.dto.response.GatheringDetailResponse;
 import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
 import com.crewcrew.domain.gathering.service.GatheringService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
+import com.crewcrew.global.common.dto.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,13 +35,13 @@ public class GatheringController {
 
   @Operation(summary = "약속 생성", description = "크루 내 새로운 약속을 생성합니다.")
   @PostMapping
-  public ResponseEntity<String> createGathering(
+  public ResponseEntity<ApiResponse> createGathering(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @Parameter(description = "약속 생성 요청 DTO", required = true) @Valid @RequestBody
           GatheringCreateRequest request,
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
     gatheringService.createGathering(crewId, request, getCurrentUsername(userDetails));
-    return ResponseEntity.ok("약속이 생성되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("약속이 생성되었습니다."));
   }
 
   @Operation(
@@ -62,13 +63,13 @@ public class GatheringController {
                     크루 내 약속에 참여합니다.
                     """)
   @PostMapping("/{gatheringId}/join")
-  public ResponseEntity<String> joinGathering(
+  public ResponseEntity<ApiResponse> joinGathering(
       @Parameter(description = "크루 ID", required = true) @PathVariable Long crewId,
       @Parameter(description = "약속 ID", required = true) @PathVariable Long gatheringId,
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     gatheringService.joinGathering(crewId, gatheringId, getCurrentUsername(userDetails));
-    return ResponseEntity.ok("약속 참여가 완료되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("약속 참여가 완료되었습니다."));
   }
 
   @Operation(
@@ -98,14 +99,14 @@ public class GatheringController {
                             - 주최자는 참여 취소가 불가능합니다.
                             """)
   @DeleteMapping("/{gatheringId}/leave")
-  public ResponseEntity<String> cancelGatheringParticipation(
+  public ResponseEntity<ApiResponse> cancelGatheringParticipation(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
       @Parameter(description = "크루 ID") @PathVariable Long crewId,
       @Parameter(description = "약속 ID") @PathVariable Long gatheringId) {
 
     gatheringService.leaveGatheringParticipation(
         getCurrentUsername(userDetails), crewId, gatheringId);
-    return ResponseEntity.ok("모임 참여가 취소되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("약속 참여가 취소되었습니다."));
   }
 
   @Operation(
@@ -118,12 +119,12 @@ public class GatheringController {
                             - 동작: 모임 취소 시 모든 참가자의 참여 정보가 함께 삭제됩니다.
                             """)
   @DeleteMapping("/{gatheringId}")
-  public ResponseEntity<Void> deleteGathering(
+  public ResponseEntity<ApiResponse> deleteGathering(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
       @Parameter(description = "크루 ID") @PathVariable Long crewId,
       @Parameter(description = "약속 ID") @PathVariable Long gatheringId) {
 
     gatheringService.deleteGathering(getCurrentUsername(userDetails), crewId, gatheringId);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok(ApiResponse.of("약속이 취소 되었습니다."));
   }
 }
