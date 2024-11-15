@@ -37,8 +37,7 @@ public class Crew extends BaseEntity {
   @Column(nullable = false)
   private String mainLocation;
 
-  @Column(nullable = false)
-  private String subLocation;
+  @Column private String subLocation;
 
   @Column(nullable = false)
   private Integer totalCount;
