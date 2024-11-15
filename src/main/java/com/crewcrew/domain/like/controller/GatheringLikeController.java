@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.crewcrew.domain.like.dto.GatheringLikeResponse;
 import com.crewcrew.domain.like.service.GatheringLikeService;
 import com.crewcrew.domain.member.dto.CustomUserDetails;
+import com.crewcrew.global.common.dto.ApiResponse;
 import com.crewcrew.global.common.dto.PaginationResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,14 +29,14 @@ public class GatheringLikeController {
 
   @Operation(summary = "찜 추가하기", description = "모임 찜 추가 API 입니다. 같은 모임에 대해 중복 추가 불가합니다.")
   @PostMapping("{gatheringId}")
-  public ResponseEntity<?> saveGatheringLike(
+  public ResponseEntity<ApiResponse> saveGatheringLike(
       @Parameter(description = "모임 ID", required = true) @PathVariable("gatheringId")
           Long gatheringId,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
 
     gatheringLikeService.saveGatheringLike(gatheringId, userDetails);
 
-    return ResponseEntity.ok("찜 생성 되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("해당 모임을 찜 하였습니다."));
   }
 
   @Operation(summary = "찜 해제하기", description = "모임 찜 해제 API 입니다. 해제한 모임에 추가로 해제 불가합니다.")
@@ -47,7 +48,7 @@ public class GatheringLikeController {
 
     gatheringLikeService.DeleteGatheringLike(gatheringId, userDetails);
 
-    return ResponseEntity.ok("찜 해제 되었습니다.");
+    return ResponseEntity.ok(ApiResponse.of("해당 모임에 대한 찜이 해제 되었습니다."));
   }
 
   @Operation(summary = "내가 찜한 목록 조회", description = "페이지네이션으로 6개씩 불러옵니다.")
