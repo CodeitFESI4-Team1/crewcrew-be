@@ -33,7 +33,6 @@ public class CrewCreateRequest {
   @NotBlank(message = "메인 지역은 필수입니다")
   private String mainLocation;
 
-  @NotBlank(message = "서브 지역은 필수입니다")
   private String subLocation;
 
   @NotNull(message = "총 인원은 필수입니다")
@@ -50,7 +49,7 @@ public class CrewCreateRequest {
         .mainCategory(MainCategory.fromLabel(mainCategory))
         .subCategory(SubCategory.fromLabel(subCategory))
         .mainLocation(mainLocation)
-        .subLocation(subLocation)
+        .subLocation(subLocation == null ? "" : subLocation)
         .totalCount(totalCount)
         .imageUrl(imageUrl)
         .isConfirmed(false)

@@ -29,7 +29,6 @@ public class CrewUpdateRequest {
   @NotBlank(message = "메인 지역은 필수입니다")
   private String mainLocation;
 
-  @NotBlank(message = "서브 지역은 필수입니다")
   private String subLocation;
 
   @NotNull(message = "총 인원은 필수입니다")

@@ -81,7 +81,7 @@ public class CrewService {
         MainCategory.fromLabel(request.getMainCategory()),
         SubCategory.fromLabel(request.getSubCategory()),
         request.getMainLocation(),
-        request.getSubLocation(),
+        request.getSubLocation() == null ? "" : request.getSubLocation(),
         request.getTotalCount(),
         request.getImageUrl());
   }
