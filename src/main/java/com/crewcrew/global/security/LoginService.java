@@ -40,27 +40,60 @@ public class LoginService {
   }
 
   @Transactional
-  public String issueRefreshToken(Long userId, String userEmail) {
+  public Cookie issueRefreshToken(Long userId, String userEmail) {
     String refreshToken =
         jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
     saveRefreshToken(userId, refreshToken, refreshExpirationTime);
-    return refreshToken;
+    return createCookie("refresh", refreshToken, refreshExpirationTime.intValue());
   }
 
   @Transactional
-  public String reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
+  public Cookie reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
     refreshRepository.deleteByRefreshToken(refreshToken);
     String newRefreshToken =
         jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
     saveRefreshToken(userId, newRefreshToken, refreshExpirationTime);
-    return newRefreshToken;
+    return createCookie("refresh", newRefreshToken, refreshExpirationTime.intValue());
   }
 
   @Transactional
-  public void revokeRefreshToken(String refreshToken) {
+  public Cookie revokeRefreshToken(String refreshToken) {
     refreshRepository.deleteByRefreshToken(refreshToken);
+    return createCookie("refresh", null, 0);
   }
 
+  private Cookie createCookie(String key, String value, int expiry) {
+    Cookie cookie = new Cookie(key, value);
+    cookie.setMaxAge(expiry);
+    cookie.setSecure(true);
+    cookie.setPath("/");
+    cookie.setHttpOnly(true);
+
+    return cookie;
+  }
+
+  //  @Transactional
+  //  public String issueRefreshToken(Long userId, String userEmail) {
+  //    String refreshToken =
+  //        jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
+  //    saveRefreshToken(userId, refreshToken, refreshExpirationTime);
+  //    return refreshToken;
+  //  }
+
+  //  @Transactional
+  //  public String reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
+  //    refreshRepository.deleteByRefreshToken(refreshToken);
+  //    String newRefreshToken =
+  //        jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
+  //    saveRefreshToken(userId, newRefreshToken, refreshExpirationTime);
+  //    return newRefreshToken;
+  //  }
+
+  //  @Transactional
+  //  public void revokeRefreshToken(String refreshToken) {
+  //    refreshRepository.deleteByRefreshToken(refreshToken);
+  //  }
+  //
   public String validateRefreshToken(Cookie[] cookies) {
     String refreshToken = null;
     for (Cookie cookie : cookies) {

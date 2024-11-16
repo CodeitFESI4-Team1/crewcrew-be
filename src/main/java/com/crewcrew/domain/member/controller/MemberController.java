@@ -1,5 +1,6 @@
 package com.crewcrew.domain.member.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -55,7 +56,7 @@ public class MemberController {
             content = {@Content()})
       })
   @PostMapping("/signup")
-  public ResponseEntity<MemberResponse.refreshTokenDto> joinByEmail(
+  public ResponseEntity<?> joinByEmail(
       HttpServletResponse response, @RequestBody @Valid MemberRequest.joinEmailDto requestDto) {
     String refreshToken = memberService.insertMemberByEmail(response, requestDto);
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -152,5 +153,30 @@ public class MemberController {
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     memberService.updateUser(file, userDetails.getUserId());
     return ResponseEntity.ok(null);
+  }
+
+  @Operation(
+      summary = "토큰 재발급 api",
+      description = "Cookie에 기존 refresh 토큰 필요, 헤더의 Authorization에 access 토큰, 바디(쿠키)에 refresh 토큰 반환")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 파라미터 형식입니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "401",
+            description = "토큰이 만료되었습니다\n\n토큰이 올바르지 않습니다",
+            content = {@Content()}),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 에러, 관리자에게 문의하세요\n\n서버 출력에 오류가 있습니다. 관리자에게 문의하세요",
+            content = {@Content()})
+      })
+  @PostMapping("/reissue")
+  public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+    memberService.reissueToken(request, response);
+    return ResponseEntity.ok(com.crewcrew.global.common.dto.ApiResponse.of("토큰이 재발급 되었습니다."));
   }
 }
