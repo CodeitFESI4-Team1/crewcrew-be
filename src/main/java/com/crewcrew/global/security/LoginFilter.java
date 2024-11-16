@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -19,7 +20,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.crewcrew.domain.member.dto.CustomUserDetails;
-import com.crewcrew.domain.member.service.MemberMapper;
+import com.crewcrew.global.common.dto.ApiResponse;
 import com.crewcrew.global.common.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -85,16 +86,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String userEmail = customUserDetails.getUsername();
 
     String accessToken = loginService.issueAccessToken(userId, userEmail);
-    //        Cookie refreshToken = loginService.issueRefreshToken(userId);
-    String refreshToken = loginService.issueRefreshToken(userId, userEmail);
+    Cookie refreshToken = loginService.issueRefreshToken(userId, userEmail);
+    //    String refreshToken = loginService.issueRefreshToken(userId, userEmail);
 
     response.addHeader("Authorization", accessToken);
-    //        response.addCookie(refreshToken);
+    response.addCookie(refreshToken);
     writeOutput(
         request,
         response,
         HttpServletResponse.SC_OK,
-        ResponseEntity.ok(MemberMapper.toRefreshToken(refreshToken)));
+        ResponseEntity.ok(ApiResponse.of("쿠키에 리프레쉬토큰이 저장되었습니다.")));
   }
 
   @Override

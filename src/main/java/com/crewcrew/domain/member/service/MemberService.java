@@ -1,5 +1,7 @@
 package com.crewcrew.domain.member.service;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +18,7 @@ import com.crewcrew.domain.member.repository.MemberRepository;
 import com.crewcrew.global.common.exception.ApiException;
 import com.crewcrew.global.common.exception.ErrorCode;
 import com.crewcrew.global.security.LoginService;
+import com.crewcrew.global.security.jwt.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class MemberService {
   private final MemberRepository memberRepository;
   private final BCryptPasswordEncoder encoder;
   private final ImageService imageService;
+  private final JwtUtil jwtUtil;
 
   @Transactional
   public String insertMemberByEmail(
@@ -42,10 +46,12 @@ public class MemberService {
 
   private String issueToken(Long memberId, String userEmail, HttpServletResponse response) {
     String newAccessToken = loginService.issueAccessToken(memberId, userEmail);
-    String newRefreshToken = loginService.issueRefreshToken(memberId, userEmail);
+    Cookie refreshToken = loginService.issueRefreshToken(memberId, userEmail);
+    //    String newRefreshToken = loginService.issueRefreshToken(memberId, userEmail);
 
     response.addHeader("Authorization", newAccessToken);
-    return newRefreshToken;
+    response.addCookie(refreshToken);
+    return "쿠키에 리프레쉬 토큰이 저장되었습니다.";
   }
 
   @Transactional
@@ -81,5 +87,18 @@ public class MemberService {
         member.getNickName(),
         profileImageUrl,
         member.getDeletedAt());
+  }
+
+  @Transactional
+  public void reissueToken(HttpServletRequest request, HttpServletResponse response) {
+    String refreshToken = loginService.validateRefreshToken(request.getCookies());
+
+    Long userId = jwtUtil.getUserId(refreshToken);
+    String userEmail = jwtUtil.getUserEmail(refreshToken);
+    String newAccessToken = loginService.issueAccessToken(userId, userEmail);
+    Cookie newRefreshToken = loginService.reissueRefreshToken(userId, userEmail, refreshToken);
+    //    String newRefreshToken = loginService.reissueRefreshToken(userId,userEmail, refreshToken);
+
+    response.addHeader("Authorization", newAccessToken);
   }
 }
