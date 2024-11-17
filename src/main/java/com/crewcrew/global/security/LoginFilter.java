@@ -5,11 +5,12 @@ import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -86,11 +87,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String userEmail = customUserDetails.getUsername();
 
     String accessToken = loginService.issueAccessToken(userId, userEmail);
-    Cookie refreshToken = loginService.issueRefreshToken(userId, userEmail);
+    ResponseCookie refreshToken = loginService.issueRefreshToken(userId, userEmail);
     //    String refreshToken = loginService.issueRefreshToken(userId, userEmail);
 
     response.addHeader("Authorization", accessToken);
-    response.addCookie(refreshToken);
+    response.addHeader(HttpHeaders.SET_COOKIE, refreshToken.toString());
     writeOutput(
         request,
         response,

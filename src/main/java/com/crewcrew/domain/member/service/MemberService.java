@@ -1,9 +1,10 @@
 package com.crewcrew.domain.member.service;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +47,11 @@ public class MemberService {
 
   private String issueToken(Long memberId, String userEmail, HttpServletResponse response) {
     String newAccessToken = loginService.issueAccessToken(memberId, userEmail);
-    Cookie refreshToken = loginService.issueRefreshToken(memberId, userEmail);
+    ResponseCookie refreshToken = loginService.issueRefreshToken(memberId, userEmail);
     //    String newRefreshToken = loginService.issueRefreshToken(memberId, userEmail);
 
     response.addHeader("Authorization", newAccessToken);
-    response.addCookie(refreshToken);
+    response.addHeader(HttpHeaders.SET_COOKIE, refreshToken.toString());
     return "쿠키에 리프레쉬 토큰이 저장되었습니다.";
   }
 
@@ -96,7 +97,8 @@ public class MemberService {
     Long userId = jwtUtil.getUserId(refreshToken);
     String userEmail = jwtUtil.getUserEmail(refreshToken);
     String newAccessToken = loginService.issueAccessToken(userId, userEmail);
-    Cookie newRefreshToken = loginService.reissueRefreshToken(userId, userEmail, refreshToken);
+    ResponseCookie newRefreshToken =
+        loginService.reissueRefreshToken(userId, userEmail, refreshToken);
     //    String newRefreshToken = loginService.reissueRefreshToken(userId,userEmail, refreshToken);
 
     response.addHeader("Authorization", newAccessToken);

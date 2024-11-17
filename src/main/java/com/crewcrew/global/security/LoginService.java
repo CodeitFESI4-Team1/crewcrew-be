@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,7 +41,7 @@ public class LoginService {
   }
 
   @Transactional
-  public Cookie issueRefreshToken(Long userId, String userEmail) {
+  public ResponseCookie issueRefreshToken(Long userId, String userEmail) {
     String refreshToken =
         jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
     saveRefreshToken(userId, refreshToken, refreshExpirationTime);
@@ -48,7 +49,7 @@ public class LoginService {
   }
 
   @Transactional
-  public Cookie reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
+  public ResponseCookie reissueRefreshToken(Long userId, String userEmail, String refreshToken) {
     refreshRepository.deleteByRefreshToken(refreshToken);
     String newRefreshToken =
         jwtUtil.createJwt("refresh", userId, userEmail, refreshExpirationTime * 1000L);
@@ -57,19 +58,22 @@ public class LoginService {
   }
 
   @Transactional
-  public Cookie revokeRefreshToken(String refreshToken) {
+  public ResponseCookie revokeRefreshToken(String refreshToken) {
     refreshRepository.deleteByRefreshToken(refreshToken);
     return createCookie("refresh", null, 0);
   }
 
-  private Cookie createCookie(String key, String value, int expiry) {
-    Cookie cookie = new Cookie(key, value);
-    cookie.setMaxAge(expiry);
-    cookie.setSecure(true);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
+  private ResponseCookie createCookie(String key, String value, int expiry) {
+    ResponseCookie responseCookie =
+        ResponseCookie.from(key, value)
+            .maxAge(expiry)
+            .secure(true)
+            .path("/")
+            .httpOnly(true)
+            .sameSite("None")
+            .build();
 
-    return cookie;
+    return responseCookie;
   }
 
   //  @Transactional
