@@ -103,4 +103,14 @@ public class MemberService {
 
     response.addHeader("Authorization", newAccessToken);
   }
+
+  @Transactional
+  public void resetProfileImage(String email) {
+    Member member =
+        memberRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new ApiException(ErrorCode.MEMBER_NOT_FOUND));
+
+    member.resetProfileImageUrl();
+  }
 }

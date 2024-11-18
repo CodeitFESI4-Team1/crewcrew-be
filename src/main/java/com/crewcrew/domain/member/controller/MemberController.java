@@ -1,5 +1,7 @@
 package com.crewcrew.domain.member.controller;
 
+import static com.crewcrew.global.common.exception.SecurityUtil.getCurrentUsername;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import com.crewcrew.domain.member.service.MemberMapper;
 import com.crewcrew.domain.member.service.MemberService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -178,5 +181,12 @@ public class MemberController {
   public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
     memberService.reissueToken(request, response);
     return ResponseEntity.ok(com.crewcrew.global.common.dto.ApiResponse.of("토큰이 재발급 되었습니다."));
+  }
+
+  @PutMapping("/profile-image/reset")
+  public ResponseEntity<com.crewcrew.global.common.dto.ApiResponse> resetProfileImage(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+    memberService.resetProfileImage(getCurrentUsername(userDetails));
+    return ResponseEntity.ok(com.crewcrew.global.common.dto.ApiResponse.of("기본 이미지로 변경 되었습니다."));
   }
 }

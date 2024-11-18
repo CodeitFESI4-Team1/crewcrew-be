@@ -50,4 +50,8 @@ public class Member extends BaseEntity {
     this.profileImageUrl = profileImageUrl;
     this.deletedAt = deletedAt;
   }
+
+  public void resetProfileImageUrl() {
+    this.profileImageUrl = null;
+  }
 }
