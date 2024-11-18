@@ -183,7 +183,7 @@ public class MemberController {
     return ResponseEntity.ok(com.crewcrew.global.common.dto.ApiResponse.of("토큰이 재발급 되었습니다."));
   }
 
-  @Operation(summary = "유저 프로필 이미지 초기화")
+  @Operation(summary = "유저 프로필 이미지 초기화", description = "로그인 한 유저의 프로일 이미지를 null로 초기화 합니다.")
   @PutMapping("/profile-image/reset")
   public ResponseEntity<com.crewcrew.global.common.dto.ApiResponse> resetProfileImage(
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
