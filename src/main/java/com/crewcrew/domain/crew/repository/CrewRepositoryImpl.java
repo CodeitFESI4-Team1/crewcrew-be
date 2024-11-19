@@ -1,5 +1,6 @@
 package com.crewcrew.domain.crew.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -69,11 +70,16 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
             .where(QMemberCrew.memberCrew.crew.id.eq(crewId))
             .fetch();
 
-    Long gatheringCount =
+    Long activeGatheringCount =
         queryFactory
             .select(QGathering.gathering.count())
             .from(QGathering.gathering)
-            .where(QGathering.gathering.crew.id.eq(crewId))
+            .where(
+                QGathering.gathering
+                    .crew
+                    .id
+                    .eq(crewId)
+                    .and(QGathering.gathering.dateTime.after(LocalDateTime.now())))
             .fetchOne();
 
     return Optional.of(
@@ -89,7 +95,7 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
             .totalCount(crew.getTotalCount())
             .imageUrl(crew.getImageUrl())
             .isConfirmed(crew.isConfirmed())
-            .totalGatheringCount(gatheringCount != null ? gatheringCount.intValue() : 0)
+            .totalGatheringCount(activeGatheringCount != null ? activeGatheringCount.intValue() : 0)
             .crewMembers(members)
             .build());
   }
@@ -210,7 +216,11 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                     ExpressionUtils.as(
                         JPAExpressions.select(QGathering.gathering.count())
                             .from(QGathering.gathering)
-                            .where(QGathering.gathering.crew.eq(QCrew.crew)),
+                            .where(
+                                QGathering.gathering
+                                    .crew
+                                    .eq(QCrew.crew)
+                                    .and(QGathering.gathering.dateTime.after(LocalDateTime.now()))),
                         "totalGatheringCount")))
             .from(QCrew.crew)
             .where(
