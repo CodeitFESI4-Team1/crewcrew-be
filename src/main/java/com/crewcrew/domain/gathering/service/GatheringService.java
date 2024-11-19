@@ -4,7 +4,10 @@ import static com.crewcrew.global.common.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -161,6 +164,7 @@ public class GatheringService {
 
   public PagedResponse<GatheringReviewResponse> getReviewableGatherings(
       String email, Pageable pageable) {
+
     Member member =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
@@ -168,12 +172,32 @@ public class GatheringService {
         gatheringRepository.findAllReviewableGatherings(
             member.getId(), LocalDateTime.now(), pageable);
 
+    if (gatherings.isEmpty()) {
+      return new PagedResponse<>(Collections.emptyList(), false);
+    }
+
+    List<Long> gatheringIds =
+        gatherings.getContent().stream().map(GatheringReviewResponse::getId).toList();
+
+    Map<Long, List<GatheringParticipantResponse>> participantsByGathering =
+        gatheringRepository.findParticipantsByGatheringIds(gatheringIds).stream()
+            .collect(
+                Collectors.groupingBy(
+                    GatheringParticipantMapping::getGatheringId,
+                    Collectors.mapping(
+                        GatheringParticipantMapping::getParticipant, Collectors.toList())));
+
     List<GatheringReviewResponse> limitedParticipants =
         gatherings.getContent().stream()
             .map(
                 gathering -> {
-                  List<GatheringParticipantResponse> limitedList =
-                      gathering.getParticipants().stream().limit(4).toList();
+                  List<GatheringParticipantResponse> participants =
+                      participantsByGathering
+                          .getOrDefault(gathering.getId(), Collections.emptyList())
+                          .stream()
+                          .limit(4)
+                          .toList();
+
                   return GatheringReviewResponse.builder()
                       .id(gathering.getId())
                       .title(gathering.getTitle())
@@ -182,7 +206,7 @@ public class GatheringService {
                       .currentCount(gathering.getCurrentCount())
                       .totalCount(gathering.getTotalCount())
                       .imageUrl(gathering.getImageUrl())
-                      .participants(limitedList)
+                      .participants(participants)
                       .build();
                 })
             .toList();
