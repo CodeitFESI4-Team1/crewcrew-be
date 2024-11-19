@@ -12,9 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.crewcrew.domain.gathering.dto.response.GatheringListResponse;
-import com.crewcrew.domain.gathering.dto.response.GatheringReviewResponse;
-import com.crewcrew.domain.gathering.dto.response.MyGatheringListResponse;
+import com.crewcrew.domain.gathering.dto.response.*;
 import com.crewcrew.domain.gathering.entity.Gathering;
 
 @Repository
@@ -92,12 +90,7 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
       "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringReviewResponse("
           + "g.id, g.title, g.dateTime, g.location, "
           + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
-          + "g.totalCount, g.imageUrl, "
-          + "(SELECT new com.crewcrew.domain.gathering.dto.response.GatheringParticipantResponse("
-          + "    m.id, m.profileImageUrl) "
-          + " FROM GatheringParticipant gp JOIN gp.member m "
-          + " WHERE gp.gathering = g "
-          + " ORDER BY gp.createdAt DESC)) "
+          + "g.totalCount, g.imageUrl, null) "
           + "FROM Gathering g "
           + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp WHERE gp.gathering = g "
           + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = false) "
@@ -105,4 +98,15 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "ORDER BY g.dateTime DESC")
   Slice<GatheringReviewResponse> findAllReviewableGatherings(
       @Param("memberId") Long memberId, @Param("now") LocalDateTime now, Pageable pageable);
+
+  @Query(
+      "SELECT g.id as gatheringId, "
+          + "new com.crewcrew.domain.gathering.dto.response.GatheringParticipantResponse(m.id, m.profileImageUrl) as participant "
+          + "FROM GatheringParticipant gp "
+          + "JOIN gp.gathering g "
+          + "JOIN gp.member m "
+          + "WHERE g.id IN :gatheringIds "
+          + "ORDER BY g.id, gp.createdAt DESC")
+  List<GatheringParticipantMapping> findParticipantsByGatheringIds(
+      @Param("gatheringIds") List<Long> gatheringIds);
 }
