@@ -12,6 +12,7 @@ public class GatheringLikeResponse {
   @NoArgsConstructor
   public static class GatheringLikeList {
     private Long id;
+    private Long crewId;
     private String title;
     private LocalDateTime dateTime;
     private String location;
