@@ -28,6 +28,7 @@ public class GatheringLikeRepositoryImpl implements GatheringLikeCustomRepositor
                     GatheringLikeResponse.GatheringLikeList.class,
                     QGatheringLike.gatheringLike.gathering.id.as("id"),
                     QGatheringLike.gatheringLike.gathering.title.as("title"),
+                    QGatheringLike.gatheringLike.gathering.crew.id.as("crewId"),
                     QGatheringLike.gatheringLike.gathering.dateTime.as("dateTime"),
                     QGatheringLike.gatheringLike.gathering.location.as("location"),
                     QGatheringLike.gatheringLike.gathering.count().as("currentCount"),
