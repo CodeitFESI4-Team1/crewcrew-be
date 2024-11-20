@@ -94,7 +94,6 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
             .participantCount(members.size())
             .totalCount(crew.getTotalCount())
             .imageUrl(crew.getImageUrl())
-            .isConfirmed(crew.isConfirmed())
             .totalGatheringCount(activeGatheringCount != null ? activeGatheringCount.intValue() : 0)
             .crewMembers(members)
             .build());
