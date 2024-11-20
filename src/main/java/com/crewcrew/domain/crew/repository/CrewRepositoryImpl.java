@@ -211,7 +211,6 @@ public class CrewRepositoryImpl implements CrewCustomRepository {
                         "participantCount"),
                     QCrew.crew.totalCount,
                     QCrew.crew.imageUrl,
-                    QCrew.crew.isConfirmed,
                     ExpressionUtils.as(
                         JPAExpressions.select(QGathering.gathering.count())
                             .from(QGathering.gathering)
