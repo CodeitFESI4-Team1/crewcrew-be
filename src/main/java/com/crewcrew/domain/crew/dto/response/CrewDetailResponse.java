@@ -22,7 +22,6 @@ public class CrewDetailResponse {
   private Integer participantCount;
   private Integer totalCount;
   private String imageUrl;
-  private boolean isConfirmed;
 
   private Integer totalGatheringCount;
   private List<CrewMemberResponse> crewMembers;

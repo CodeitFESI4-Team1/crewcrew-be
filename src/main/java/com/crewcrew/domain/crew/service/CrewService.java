@@ -208,7 +208,6 @@ public class CrewService {
         .participantCount(crew.getParticipantCount())
         .totalCount(crew.getTotalCount())
         .imageUrl(crew.getImageUrl())
-        .isConfirmed(crew.getIsConfirmed())
         .totalGatheringCount(crew.getTotalGatheringCount())
         .build();
   }
