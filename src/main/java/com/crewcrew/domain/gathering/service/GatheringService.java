@@ -90,10 +90,6 @@ public class GatheringService {
     Member currentMember =
         memberRepository.findByEmail(email).orElseThrow(() -> new ApiException(MEMBER_NOT_FOUND));
 
-    memberCrewRepository
-        .findByCrewIdAndMemberId(crewId, currentMember.getId())
-        .orElseThrow(() -> new ApiException(CREW_MEMBER_NOT_FOUND));
-
     boolean isLiked =
         likeRepository.existsByGatheringIdAndMemberId(gatheringId, currentMember.getId());
     boolean isGatheringCaptain =
