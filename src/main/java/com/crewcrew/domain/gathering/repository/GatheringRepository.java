@@ -87,19 +87,6 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
   void deleteByCrewId(@Param("crewId") Long crewId);
 
   @Query(
-      "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringReviewResponse("
-          + "g.id, g.title, g.dateTime, g.location, "
-          + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
-          + "g.totalCount, g.imageUrl, null) "
-          + "FROM Gathering g "
-          + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp WHERE gp.gathering = g "
-          + "   AND gp.member.id = :memberId AND gp.isGatheringCaptain = false) "
-          + "AND g.dateTime < :now "
-          + "ORDER BY g.dateTime DESC")
-  Slice<GatheringReviewResponse> findAllReviewableGatherings(
-      @Param("memberId") Long memberId, @Param("now") LocalDateTime now, Pageable pageable);
-
-  @Query(
       "SELECT g.id as gatheringId, "
           + "new com.crewcrew.domain.gathering.dto.response.GatheringParticipantResponse(m.id, m.profileImageUrl) as participant "
           + "FROM GatheringParticipant gp "
@@ -109,4 +96,22 @@ public interface GatheringRepository extends JpaRepository<Gathering, Long> {
           + "ORDER BY g.id, gp.createdAt DESC")
   List<GatheringParticipantMapping> findParticipantsByGatheringIds(
       @Param("gatheringIds") List<Long> gatheringIds);
+
+  @Query(
+      "SELECT new com.crewcrew.domain.gathering.dto.response.GatheringReviewResponse("
+          + "g.id, g.title, g.dateTime, g.location, "
+          + "(SELECT COUNT(gp) FROM GatheringParticipant gp WHERE gp.gathering = g), "
+          + "g.totalCount, g.imageUrl, null) "
+          + "FROM Gathering g "
+          + "WHERE EXISTS (SELECT 1 FROM GatheringParticipant gp "
+          + "   WHERE gp.gathering = g "
+          + "   AND gp.member.id = :memberId "
+          + "   AND gp.isGatheringCaptain = false) "
+          + "AND g.dateTime < :now "
+          + "AND NOT EXISTS (SELECT 1 FROM Review r "
+          + "   WHERE r.gathering = g "
+          + "   AND r.member.id = :memberId) "
+          + "ORDER BY g.dateTime DESC")
+  Slice<GatheringReviewResponse> findAllReviewableGatherings(
+      @Param("memberId") Long memberId, @Param("now") LocalDateTime now, Pageable pageable);
 }
