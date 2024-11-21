@@ -97,8 +97,8 @@ public class MemberService {
     Long userId = jwtUtil.getUserId(refreshToken);
     String userEmail = jwtUtil.getUserEmail(refreshToken);
     String newAccessToken = loginService.issueAccessToken(userId, userEmail);
-    ResponseCookie newRefreshToken =
-        loginService.reissueRefreshToken(userId, userEmail, refreshToken);
+    //    ResponseCookie newRefreshToken =
+    //        loginService.reissueRefreshToken(userId, userEmail, refreshToken);
     //    String newRefreshToken = loginService.reissueRefreshToken(userId,userEmail, refreshToken);
 
     response.addHeader("Authorization", newAccessToken);
